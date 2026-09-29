@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central do Planejamento | Control Tower Executivo</title>
+
+    <meta http-equiv="refresh" content="600">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <link rel="icon" type="image/png" href="planning.png?v=3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ========================================== */
+        /* BASE & BACKGROUND                          */
+        /* ========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: linear-gradient(#000000bd, #020250d4), url('Background.png'); background-size: cover; background-position: center; background-attachment: fixed; display: flex; flex-direction: column; min-height: 100vh; padding: 2vh 3%; overflow-x: hidden; overflow-y: auto; gap: 16px; align-items: center; position: relative; }
+        .glow-sphere-cyan { position: fixed; top: -100px; left: -100px; width: 550px; height: 500px; background: radial-gradient(circle, rgba(0, 210, 255, 0.18) 0%, rgba(0, 0, 0, 0) 70%); z-index: 0; pointer-events: none; }
+        .glow-sphere-red { position: fixed; bottom: -150px; right: -100px; width: 650px; height: 600px; background: radial-gradient(circle, rgba(230, 67, 67, 0.15) 0%, rgba(0, 0, 0, 0) 70%); z-index: 0; pointer-events: none; }
+        .top-bar, .main-layout, .bar-pilares, .rodape { width: 100%; max-width: 1600px; margin: 0 auto; position: relative; z-index: 2; }
+
+        /* ========================================== */
+        /* CABEÇALHO (HEADER)                         */
+        /* ========================================== */
+        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; }
+        .welcome-text { color: #e64343; font-size: 0.75rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 2px; }
+        .header h1 { font-family: "Goldman", sans-serif; font-size: 2.1rem; color: #ffffff; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; line-height: 1.1; margin-bottom: 4px; }
+        .header h1 .destaque { color: #e64343; text-shadow: 0 0 15px rgba(230, 67, 67, 0.5); }
+        .header p { font-size: 0.85rem; color: #a0aab5; }
+        .logo-topo { max-width: 120px; height: auto; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.15)); }
+
+        /* ========================================== */
+        /* LAYOUT PRINCIPAL (LARGURA TOTAL)           */
+        /* ========================================== */
+        .main-layout { display: flex; gap: 16px; align-items: stretch; width: 100%; }
+
+        /* ========================================== */
+        /* ÁREA PRINCIPAL & ABAS                      */
+        /* ========================================== */
+        .dashboard-content { flex: 1; display: flex; flex-direction: column; gap: 0; min-width: 0; }
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 12px; position: relative; z-index: 3; flex-wrap: wrap; }
+        .btn-tab { background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); color: #8a99ad; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 0.76rem; font-weight: 600; display: flex; align-items: center; gap: 7px; backdrop-filter: blur(12px); transition: all 0.25s ease; }
+        .btn-tab .material-symbols-outlined { font-size: 18px; opacity: 0.7; }
+        .btn-tab:hover { background: rgba(30, 41, 59, 0.6); color: #ffffff; border-color: rgba(0, 210, 255, 0.3); transform: translateY(-1px); }
+        .btn-tab.active { background: rgba(0, 210, 255, 0.12); border: 1px solid rgba(0, 210, 255, 0.4); color: #00d2ff; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.12); }
+        .btn-tab.active .material-symbols-outlined { opacity: 1; color: #00d2ff; filter: drop-shadow(0 0 6px rgba(0, 210, 255, 0.6)); }
+
+        .tu-dashboard-container { width: 100%; background: rgba(11, 19, 38, 0.6); backdrop-filter: blur(24px); border: 1px solid rgba(0, 210, 255, 0.25); border-radius: 16px; padding: 18px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 210, 255, 0.04); display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 2; }
+        .tab-panel { display: none; flex-direction: column; gap: 16px; width: 100%; }
+        .tab-panel.active { display: flex; }
+
+        .tu-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; }
+        .tu-title-group { display: flex; align-items: center; gap: 10px; }
+        .tu-header h2 { font-size: 1.05rem; color: #ffffff; display: flex; align-items: center; gap: 8px; font-weight: 700; }
+        .tu-header h2 .material-symbols-outlined { color: #00d2ff; font-size: 22px; filter: drop-shadow(0 0 8px rgba(0, 210, 255, 0.5)); }
+        .header-badges { display: flex; align-items: center; gap: 10px; }
+
+        .tu-status-badge { font-size: 0.72rem; background: rgba(0, 210, 255, 0.1); color: #00d2ff; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(0, 210, 255, 0.35); display: flex; align-items: center; gap: 6px; font-weight: 600; }
+        .status-dot { width: 7px; height: 7px; background-color: #00d2ff; border-radius: 50%; box-shadow: 0 0 10px #00d2ff; animation: pulsar 1.6s infinite ease-in-out; }
+        @keyframes pulsar { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.3); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* ========================================== */
+        /* CARDS PRINCIPAIS                           */
+        /* ========================================== */
+        .tu-grid-main { display: grid; gap: 10px; transition: all 0.3s ease; }
+        .tu-card { background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 8px; min-width: 0; backdrop-filter: blur(12px); transition: transform 0.3s ease; position: relative; overflow: hidden; }
+        .tu-card .icon { font-size: 22px; padding: 6px; border-radius: 8px; flex-shrink: 0; }
+        .tu-info { min-width: 0; overflow: hidden; flex: 1; }
+        .tu-info .label { font-size: 0.65rem; color: #a0aab5; text-transform: uppercase; font-weight: 700; display: block; }
+        .tu-info h3 { font-size: 1.25rem; color: #ffffff; font-weight: 800; margin: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tu-info small { font-size: 0.65rem; color: #a0aab5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+        .card-cyan { border-color: rgba(0, 210, 255, 0.3); } .card-cyan .icon { color: #00d2ff; background: rgba(0, 210, 255, 0.12); } 
+        .card-yellow { border-color: rgba(246, 185, 59, 0.3); } .card-yellow .icon { color: #f6b93b; background: rgba(246, 185, 59, 0.12); } 
+        .card-purple { border-color: rgba(155, 89, 182, 0.3); } .card-purple .icon { color: #9b59b6; background: rgba(155, 89, 182, 0.12); } 
+        .card-red { border-color: rgba(255, 75, 43, 0.3); } .card-red .icon { color: #ff4b2b; background: rgba(255, 75, 43, 0.12); } 
+        .card-green { border-color: rgba(0, 176, 155, 0.3); } .card-green .icon { color: #00b09b; background: rgba(0, 176, 155, 0.12); }
+
+        .card-progress { display: flex; flex-direction: column; align-items: stretch; justify-content: center; }
+        .card-progress-content { display: flex; align-items: center; gap: 8px; width: 100%; }
+        .progress-bar-container { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.08); border-radius: 4px; margin-top: 6px; overflow: hidden; position: relative; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00b09b 0%, #00d2ff 100%); border-radius: 4px; transition: width 1s ease-in-out; }
+
+        .tu-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .tu-detail-box { background: rgba(15, 23, 42, 0.5); border-radius: 12px; padding: 12px 14px; border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); }
+        .tu-detail-box h4 { color: #ffffff; font-size: 0.8rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; font-weight: 700; }
+        .tu-detail-box h4 .material-symbols-outlined { font-size: 18px; color: #00d2ff; }
+        .box-warning h4 .material-symbols-outlined { color: #f6b93b; } 
+        .box-red h4 .material-symbols-outlined { color: #ff4b2b; } 
+        .box-purple h4 .material-symbols-outlined { color: #9b59b6; } 
+        .box-cyan h4 .material-symbols-outlined { color: #00d2ff; } 
+        
+        .tu-table { width: 100%; border-collapse: collapse; font-size: 0.73rem; margin-top: 4px; }
+        .tu-table th { color: #a0aab5; text-transform: uppercase; font-size: 0.63rem; font-weight: 700; padding: 8px 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center; }
+        .tu-table td { padding: 6px; color: #a0aab5; border-bottom: 1px dashed rgba(255, 255, 255, 0.05); text-align: center; }
+        .tu-table td:first-child { text-align: left; color: #ffffff; font-weight: 600; }
+        .tu-table td span.val { color: #00d2ff; font-weight: 700; }
+        .carreta-tag { font-size: 0.68rem; padding: 2px 8px; border-radius: 6px; font-weight: 700; }
+
+        .table-fechamento-header { background: #1e293b !important; }
+        .table-fechamento-header th { color: #cbd5e1 !important; border-bottom: 2px solid rgba(0, 210, 255, 0.3) !important; padding: 6px 4px !important; }
+        .input-filtro-tabela { width: 95%; max-width: 110px; margin-top: 4px; padding: 3px 6px; font-size: 0.62rem; font-weight: 600; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.7); color: #ffffff; outline: none; transition: border-color 0.2s; }
+        .input-filtro-tabela:focus { border-color: #00d2ff; box-shadow: 0 0 6px rgba(0, 210, 255, 0.4); }
+
+        .grid-mes-acumulado { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .fifo-triple-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .fifo-alert-card { background: linear-gradient(135deg, rgba(0, 210, 255, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%); border: 1px solid rgba(0, 210, 255, 0.35); border-left: 4px solid #00d2ff; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: inset 0 0 15px rgba(0, 210, 255, 0.05); }
+        .fifo-card-varejo { background: linear-gradient(135deg, rgba(0, 176, 155, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%); border: 1px solid rgba(0, 176, 155, 0.35); border-left: 4px solid #00b09b; }
+        .fifo-card-estojo { background: linear-gradient(135deg, rgba(246, 185, 59, 0.12) 0%, rgba(15, 23, 42, 0.7) 100%); border: 1px solid rgba(246, 185, 59, 0.35); border-left: 4px solid #f6b93b; }
+        .fifo-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .fifo-info .material-symbols-outlined { font-size: 20px; color: #00d2ff; background: rgba(0, 210, 255, 0.15); padding: 5px; border-radius: 8px; flex-shrink: 0; }
+        .fifo-card-varejo .fifo-info .material-symbols-outlined { color: #00b09b; background: rgba(0, 176, 155, 0.15); }
+        .fifo-card-estojo .fifo-info .material-symbols-outlined { color: #f6b93b; background: rgba(246, 185, 59, 0.15); }
+        .fifo-text { min-width: 0; overflow: hidden; }
+        .fifo-text .tag { font-size: 0.60rem; color: #a0aab5; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; display: block; }
+        .fifo-text h3 { font-size: 0.82rem; color: #ffffff; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fifo-details { display: flex; flex-direction: column; align-items: flex-end; font-size: 0.68rem; color: #a0aab5; gap: 1px; flex-shrink: 0; }
+        .fifo-details span strong { color: #00d2ff; } .fifo-card-varejo .fifo-details span strong { color: #00b09b; } .fifo-card-estojo .fifo-details span strong { color: #f6b93b; }
+        .detail-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.74rem; color: #a0aab5; padding: 5px 0; border-bottom: 1px dashed rgba(255, 255, 255, 0.05); }
+        .detail-row span.val { color: #ffffff; font-weight: 700; font-feature-settings: 'tnum' on; } .detail-row span.val.status-ok { color: #00b09b; }
+        .alert-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+        .pend-tag { color: #f6b93b; background: rgba(246, 185, 59, 0.1); border: 1px solid rgba(246, 185, 59, 0.25); }
+        .ok-tag { color: #00b09b; background: rgba(0, 176, 155, 0.1); border: 1px solid rgba(0, 176, 155, 0.25); }
+
+        .wms-toggles { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; padding: 12px 14px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); align-items: center; }
+        .wms-toggles-title { font-size: 0.65rem; color: #a0aab5; text-transform: uppercase; font-weight: 700; margin-right: 10px; }
+        .btn-wms-onda { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #8a99ad; padding: 8px 16px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .btn-wms-onda:hover { background: rgba(30, 41, 59, 1); color: #ffffff; border-color: rgba(0, 210, 255, 0.3); }
+        .btn-wms-onda.active { background: rgba(0, 210, 255, 0.15); border-color: rgba(0, 210, 255, 0.6); color: #00d2ff; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.15); }
+        .status-dot-off { width: 8px; height: 8px; background-color: #475569; border-radius: 50%; display: inline-block; }
+        .status-dot-on { width: 8px; height: 8px; background-color: #00b09b; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #00b09b; animation: pulsar 1.6s infinite ease-in-out; }
+        .wms-sub-toggles { display: flex; gap: 8px; margin-bottom: 12px; }
+        .btn-sub-tab { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); color: #8a99ad; padding: 6px 16px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
+        .btn-sub-tab:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
+        .btn-sub-tab.active { background: rgba(0, 210, 255, 0.15); color: #00d2ff; border-color: #00d2ff; box-shadow: 0 0 10px rgba(0, 210, 255, 0.1); }
+        
+        .date-picker-wrapper { display: flex; align-items: center; gap: 6px; background: rgba(15, 23, 42, 0.8); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(0, 210, 255, 0.3); box-shadow: inset 0 0 10px rgba(0, 210, 255, 0.05); }
+        .date-picker-wrapper input[type="date"], .date-picker-wrapper input[type="month"] { background: transparent; border: none; color: #ffffff; font-family: inherit; font-size: 0.75rem; font-weight: 700; outline: none; cursor: pointer; color-scheme: dark; }
+        .date-picker-wrapper input[type="date"]::-webkit-calendar-picker-indicator, .date-picker-wrapper input[type="month"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.8; transition: 0.2s; }
+        .date-picker-wrapper input[type="date"]::-webkit-calendar-picker-indicator:hover, .date-picker-wrapper input[type="month"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+        /* ========================================== */
+        /* ESTATÍSTICAS MACRO (TAB 2 WMS CORRIGIDA)   */
+        /* ========================================== */
+        .macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 2px; }
+        .macro-box { background: rgba(15, 23, 42, 0.55); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; backdrop-filter: blur(12px); display: flex; flex-direction: column; }
+        .macro-box-fr { border-top: 3px solid #00d2ff; } 
+        .macro-box-gv { border-top: 3px solid #ff4b2b; } 
+        .macro-box-pc { border-top: 3px solid #9b59b6; }
+        .macro-header { padding: 10px 14px; background: rgba(255, 255, 255, 0.03); font-size: 0.75rem; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; gap: 6px; }
+        .macro-box-fr .macro-header { color: #00d2ff; } 
+        .macro-box-gv .macro-header { color: #ff4b2b; } 
+        .macro-box-pc .macro-header { color: #9b59b6; }
+        .macro-stats { display: grid; grid-template-columns: repeat(4, 1fr); padding: 14px 12px; gap: 10px; }
+        
+        /* REGRAS QUE CORRIGEM O LAYOUT DA ABA 2 */
+        .stat-item { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; }
+        .stat-item .label { font-size: 0.63rem; color: #a0aab5; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 3px; }
+        .stat-item strong { font-size: 1.15rem; color: #ffffff; font-weight: 800; font-feature-settings: 'tnum' on; display: block; line-height: 1.1; }
+        .stat-item .pct { font-size: 0.68rem; color: #00d2ff; font-weight: 700; margin-top: 3px; display: block; }
+
+        /* SCROLLBAR CUSTOMIZADA E DISCRETA PARA TABELAS */
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.3); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 210, 255, 0.6); }
+
+        .bar-pilares { display: grid; grid-template-columns: repeat(4, 1fr); padding: 8px 18px; margin-top: 6px; border-radius: 10px; background: linear-gradient(135deg, rgba(0, 210, 255, 0.08) 0%, rgba(11, 19, 38, 0.75) 50%, rgba(230, 67, 67, 0.1) 100%); backdrop-filter: blur(16px); border-top: 1px solid rgba(0, 210, 255, 0.4); border-bottom: 1px solid rgba(230, 67, 67, 0.4); }
+        .pilar-item { display: flex; align-items: center; gap: 8px; color: #a0aab5; position: relative; padding: 0 8px; }
+        .pilar-item:not(:last-child)::after { content: ''; position: absolute; right: 0; top: 20%; height: 60%; width: 1px; background: linear-gradient(to bottom, rgba(0, 210, 255, 0.35), rgba(230, 67, 67, 0.35)); }
+        .pilar-item .material-symbols-outlined { font-size: 18px; color: #00d2ff; background: rgba(0, 210, 255, 0.12); padding: 5px; border-radius: 6px; border: 1px solid rgba(0, 210, 255, 0.25); }
+        .pilar-text { font-size: 0.7rem; line-height: 1.1; }
+        .pilar-text strong { color: #ffffff; display: block; font-size: 0.76rem; letter-spacing: 0.3px; }
+        .rodape { opacity: 1; text-align: left; margin-top: 2px; }
+        .rodape p { color: #ffffff; font-size: 0.72rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+    <div class="glow-sphere-cyan"></div>
+    <div class="glow-sphere-red"></div>
+
+    <header class="top-bar">
+        <div class="header">
+            <span class="welcome-text">- Bem-vindo ao</span>
+            <h1>Central do <span class="destaque">Planejamento</span></h1>
+            <p>Soluções inteligentes para uma logística mais eficiente</p>
+        </div>
+        <img src="white-ceva.png" alt="Logo CEVA" class="logo-topo">
+    </header>
+
+    <div class="main-layout">
+        <main class="dashboard-content">
+            <div class="nav-tabs">
+                <button class="btn-tab active" onclick="trocarAba('tab-tu', this)">
+                    <span class="material-symbols-outlined">analytics</span> Controle de TUs
+                </button>
+                <button class="btn-tab" onclick="trocarAba('tab-wms', this)">
+                    <span class="material-symbols-outlined">warehouse</span> Demanda WMS
+                </button>
+                <button class="btn-tab" onclick="trocarAba('tab-movimentacoes', this)">
+                    <span class="material-symbols-outlined">sync_alt</span> Movimentações
+                </button>
+                <button class="btn-tab" onclick="trocarAba('tab-fechamento', this)">
+                    <span class="material-symbols-outlined">done_all</span> Fechamento
+                </button>
+                <button class="btn-tab" onclick="trocarAba('tab-pd', this)" style="border-color: rgba(230, 67, 67, 0.4);">
+                    <span class="material-symbols-outlined" style="color: #e64343;">group</span> PD Digital
+                </button>
+            </div>
+
+            <div class="tu-dashboard-container">
+                <!-- ========================================== -->
+                <!-- ABA 1: CONTROLE DE TUS                     -->
+                <!-- ========================================== -->
+                <div id="tab-tu" class="tab-panel active">
+                    <div class="tu-header">
+                        <div class="tu-title-group">
+                            <h2><span class="material-symbols-outlined">analytics</span> Controle de TUs</h2>
+                        </div>
+                        <div class="header-badges">
+                            <div class="date-picker-wrapper" title="Filtrar Totais do Mês">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #00d2ff;">calendar_month</span>
+                                <input type="month" id="filtro-mes-tu" onchange="aplicarFiltroMesTU()">
+                            </div>
+                            <span class="tu-status-badge">
+                                <span class="status-dot"></span>
+                                <span id="txt-status-sync">Sincronizando...</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid-mes-acumulado">
+                        <div class="tu-card card-cyan">
+                            <span class="material-symbols-outlined icon">calendar_month</span>
+                            <div class="tu-info">
+                                <span class="label" id="label-caixas-mes">Total Processado no Mês (Caixas)</span>
+                                <h3 id="caixas-mes">--</h3>
+                                <small id="sub-caixas-mes">Soma do Mês Vigente</small>
+                            </div>
+                        </div>
+                        <div class="tu-card card-purple">
+                            <span class="material-symbols-outlined icon">category</span>
+                            <div class="tu-info">
+                                <span class="label" id="label-pecas-mes">Total Processado no Mês (Peças)</span>
+                                <h3 id="pecas-mes">--</h3>
+                                <small id="sub-pecas-mes">Soma do Mês Vigente</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fifo-triple-container">
+                        <div class="fifo-alert-card">
+                            <div class="fifo-info">
+                                <span class="material-symbols-outlined">local_shipping</span>
+                                <div class="fifo-text"><span class="tag">Carteira</span><h3 id="fifo-cart-title">Sem pendências</h3></div>
+                            </div>
+                            <div class="fifo-details"><span>UF: <strong id="fifo-cart-uf">--</strong></span><span>Status: <strong id="fifo-cart-status">OK</strong></span></div>
+                        </div>
+                        <div class="fifo-alert-card fifo-card-varejo">
+                            <div class="fifo-info">
+                                <span class="material-symbols-outlined">storefront</span>
+                                <div class="fifo-text"><span class="tag">Varejo</span><h3 id="fifo-var-title">Sem pendências</h3></div>
+                            </div>
+                            <div class="fifo-details"><span>UF: <strong id="fifo-var-uf">--</strong></span><span>Status: <strong id="fifo-var-status">OK</strong></span></div>
+                        </div>
+                        <div class="fifo-alert-card fifo-card-estojo">
+                            <div class="fifo-info">
+                                <span class="material-symbols-outlined">inventory_2</span>
+                                <div class="fifo-text"><span class="tag">Estojo</span><h3 id="fifo-est-title">Sem pendências</h3></div>
+                            </div>
+                            <div class="fifo-details"><span>UF: <strong id="fifo-est-uf">--</strong></span><span>Status: <strong id="fifo-est-status">OK</strong></span></div>
+                        </div>
+                    </div>
+
+                    <div class="tu-grid-main" style="grid-template-columns: repeat(5, 1fr);">
+                        <div class="tu-card card-cyan"><span class="material-symbols-outlined icon">inventory_2</span><div class="tu-info"><span class="label">TUs Pendentes</span><h3 id="tus-pendentes">--</h3><small id="sub-tus">De -- TUs na Janela</small></div></div>
+                        <div class="tu-card card-red"><span class="material-symbols-outlined icon">local_shipping</span><div class="tu-info"><span class="label">Carretas Pendentes</span><h3 id="carretas-pendentes">--</h3><small>Pendentes de Rampa</small></div></div>
+                        <div class="tu-card card-yellow"><span class="material-symbols-outlined icon">package_2</span><div class="tu-info"><span class="label">Caixas Pendentes</span><h3 id="caixas-pendentes">--</h3><small id="sub-caixas">LN: -- | GV: --</small></div></div>
+                        <div class="tu-card card-purple"><span class="material-symbols-outlined icon">category</span><div class="tu-info"><span class="label">Peças Pendentes</span><h3 id="pecas-pendentes">--</h3><small id="sub-pecas">LN: -- | GV: --</small></div></div>
+                        <div class="tu-card card-green card-progress">
+                            <div class="card-progress-content"><span class="material-symbols-outlined icon">check_circle</span><div class="tu-info"><span class="label">Progresso</span><h3 id="progresso-pct">--%</h3><small id="sub-progresso">Alocado</small></div></div>
+                            <div class="progress-bar-container"><div class="progress-bar-fill" id="bar-progresso-fill"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="tu-details-grid">
+                        <div class="tu-detail-box">
+                            <h4><span class="material-symbols-outlined">pie_chart</span> Perfil & Volume REALIZADO</h4>
+                            <table class="tu-table">
+                                <thead><tr><th style="text-align: left;">Atendimento</th><th>Peças</th><th>Caixas</th><th>Perfil (Pç/Cx)</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Carteira (LN)</td><td id="pcs-cart_ln-tot">--</td><td id="cx-cart_ln-tot">--</td><td><span class="val" id="perf-cart_ln-tot">--</span></td></tr>
+                                    <tr><td>Carteira (GV)</td><td id="pcs-cart_gv-tot">--</td><td id="cx-cart_gv-tot">--</td><td><span class="val" id="perf-cart_gv-tot">--</span></td></tr>
+                                    <tr><td>Varejo (LN)</td><td id="pcs-var_ln-tot">--</td><td id="cx-var_ln-tot">--</td><td><span class="val" id="perf-var_ln-tot">--</span></td></tr>
+                                    <tr><td>Varejo (GV)</td><td id="pcs-var_gv-tot">--</td><td id="cx-var_gv-tot">--</td><td><span class="val" id="perf-var_gv-tot">--</span></td></tr>
+                                    <tr><td>Estojo (LN)</td><td id="pcs-est_ln-tot">--</td><td id="cx-est_ln-tot">--</td><td><span class="val" id="perf-est_ln-tot">--</span></td></tr>
+                                    <tr><td>Estojo (GV)</td><td id="pcs-est_gv-tot">--</td><td id="cx-est_gv-tot">--</td><td><span class="val" id="perf-est_gv-tot">--</span></td></tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr style="border-top: 2px solid rgba(0, 210, 255, 0.4); font-weight: 800; background: rgba(0, 210, 255, 0.08);">
+                                        <td style="color: #00d2ff; text-align: left; padding: 8px 6px;">TOTAL GERAL</td><td id="pcs-total-tot" style="color: #ffffff;">--</td><td id="cx-total-tot" style="color: #ffffff;">--</td><td><span class="val" id="perf-total-tot" style="color: #00d2ff;">--</span></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="tu-detail-box box-warning">
+                            <h4><span class="material-symbols-outlined">pending_actions</span> Perfil & Volume PENDENTE</h4>
+                            <table class="tu-table">
+                                <thead><tr><th style="text-align: left;">Atendimento</th><th>Peças</th><th>Caixas</th><th>Perfil</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Carteira (LN)</td><td id="pcs-cart_ln-pend">--</td><td id="cx-cart_ln-pend">--</td><td><span class="val" id="perf-cart_ln-pend">--</span></td></tr>
+                                    <tr><td>Carteira (GV)</td><td id="pcs-cart_gv-pend">--</td><td id="cx-cart_gv-pend">--</td><td><span class="val" id="perf-cart_gv-pend">--</span></td></tr>
+                                    <tr><td>Varejo (LN)</td><td id="pcs-var_ln-pend">--</td><td id="cx-var_ln-pend">--</td><td><span class="val" id="perf-var_ln-pend">--</span></td></tr>
+                                    <tr><td>Varejo (GV)</td><td id="pcs-var_gv-pend">--</td><td id="cx-var_gv-pend">--</td><td><span class="val" id="perf-var_gv-pend">--</span></td></tr>
+                                    <tr><td>Estojo (LN)</td><td id="pcs-est_ln-pend">--</td><td id="cx-est_ln-pend">--</td><td><span class="val" id="perf-est_ln-pend">--</span></td></tr>
+                                    <tr><td>Estojo (GV)</td><td id="pcs-est_gv-pend">--</td><td id="cx-est_gv-pend">--</td><td><span class="val" id="perf-est_gv-pend">--</span></td></tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr style="border-top: 2px solid rgba(246, 185, 59, 0.4); font-weight: 800; background: rgba(246, 185, 59, 0.08);">
+                                        <td style="color: #f6b93b; text-align: left; padding: 8px 6px;">TOTAL GERAL</td><td id="pcs-total-pend" style="color: #ffffff;">--</td><td id="cx-total-pend" style="color: #ffffff;">--</td><td><span class="val" id="perf-total-pend" style="color: #f6b93b;">--</span></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        
+                        <div class="tu-detail-box box-red">
+                            <h4><span class="material-symbols-outlined">verified</span> Acompanhamento </h4>
+                            <div class="detail-row"><span>Atendimento(s) em Andamento:</span><span id="txt-atendimentos-andamento" class="val" style="color: #00d2ff;">--</span></div>
+                            <div class="detail-row"><span>Alertas de Atraso de Atendimento:</span><span id="txt-alertas-atraso" class="val" style="color: #f6b93b;">--</span></div>
+                            <div class="detail-row"><span>Conflito de Rampas:</span><span id="alert-rampas" class="val status-ok">0 Detectado</span></div>
+                            <div class="detail-row"><span>Saúde Geral</span><span id="alert-saude" class="val status-ok">100% Auditada</span></div>
+                        </div>
+
+                        <div class="tu-detail-box box-purple">
+                            <h4><span class="material-symbols-outlined">assignment_late</span>Pendências de TU</h4>
+                            <div class="detail-row"><span>Pendências em Estojo:</span><div class="alert-group"><span class="val" id="pend-canal-estojo">--</span></div></div>
+                            <div class="detail-row"><span>Pendências em Carteira:</span><div class="alert-group"><span class="val" id="pend-canal-carteira">--</span></div></div>
+                            <div class="detail-row"><span>Pendências em Varejo:</span><div class="alert-group"><span class="val" id="pend-canal-varejo">--</span></div></div>
+                            <div class="detail-row"><span>Outras Pendências:</span><div class="alert-group"><span class="val" id="pend-canal-outras">--</span></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- ABA 2: DEMANDAS WMS                        -->
+                <!-- ========================================== -->
+                <div id="tab-wms" class="tab-panel">
+                    <div class="tu-header">
+                        <div class="tu-title-group">
+                            <h2><span class="material-symbols-outlined">warehouse</span> Balanceamento da Demanda</h2>
+                        </div>
+                        <div class="header-badges">
+                            <div class="date-picker-wrapper" title="Selecione um dia do Histórico">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #00d2ff;">calendar_today</span>
+                                <input type="date" id="filtro-data-wms" onchange="aplicarFiltroDataWMS()">
+                            </div>
+                            <span class="tu-status-badge">
+                                <span class="status-dot"></span>
+                                <span id="txt-wms-status-sync">Sincronizando...</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="wms-toggles" id="container-wms-botoes">
+                        <div class="wms-toggles-title">ATENDIMENTOS:</div>
+                        <button class="btn-wms-onda active" onclick="selecionarCanalWMS('VAREJO', this)"><span class="status-dot-off" id="dot-VAREJO"></span> VAREJO</button>
+                        <button class="btn-wms-onda" onclick="selecionarCanalWMS('MGC', this)"><span class="status-dot-off" id="dot-MGC"></span> MGC</button>
+                        <button class="btn-wms-onda" onclick="selecionarCanalWMS('SPI', this)"><span class="status-dot-off" id="dot-SPI"></span> SPI</button>
+                        <button class="btn-wms-onda" onclick="selecionarCanalWMS('SPC', this)"><span class="status-dot-off" id="dot-SPC"></span> SPC</button>
+                        <button class="btn-wms-onda" onclick="selecionarCanalWMS('MGI', this)"><span class="status-dot-off" id="dot-MGI"></span> MGI</button>
+                    </div>
+
+                    <div class="wms-sub-toggles">
+                        <button class="btn-sub-tab" id="btn-previa-carteira" onclick="mudarVisaoWMS('PREVIA_CARTEIRA')" style="display: none;">PRÉVIA CARTEIRA</button>
+                        <button class="btn-sub-tab active" id="btn-real-carteira" onclick="mudarVisaoWMS('REAL_CARTEIRA')">REAL VAREJO</button>
+                        <button class="btn-sub-tab" id="btn-previa-kit" onclick="mudarVisaoWMS('PREVIA_KIT')" style="display: none;">PRÉVIA KIT</button>
+                        <button class="btn-sub-tab" id="btn-real-kit" onclick="mudarVisaoWMS('REAL_KIT')" style="display: none;">REAL KIT</button>
+                    </div>
+
+                    <div class="tu-grid-main" id="grid-wms-globais" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 10px;">
+                        <div class="tu-card card-green">
+                            <span class="material-symbols-outlined icon">category</span>
+                            <div class="tu-info"><span class="label">Total Global Peças</span><h3 id="wms-tot-pcs">--</h3></div>
+                        </div>
+                        <div class="tu-card card-green">
+                            <span class="material-symbols-outlined icon">package_2</span>
+                            <div class="tu-info"><span class="label">Total Global Caixas</span><h3 id="wms-tot-cxs">--</h3></div>
+                        </div>
+                    </div>
+
+                    <div class="tu-grid-main" id="grid-wms-indicadores" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="tu-card card-green card-progress" id="card-aderencia-wms" style="display: none;">
+                            <div class="card-progress-content">
+                                <span class="material-symbols-outlined icon">verified</span>
+                                <div class="tu-info"><span class="label">Aderência da Demanda</span><h3 id="wms-aderencia">--%</h3></div>
+                            </div>
+                            <div class="progress-bar-container"><div class="progress-bar-fill" id="bar-aderencia-fill"></div></div>
+                        </div>
+                        <div class="tu-card card-cyan"><span class="material-symbols-outlined icon">route</span><div class="tu-info"><span class="label">Estações Visitadas por Caixa</span><h3 id="wms-est-cx">--</h3></div></div>
+                        <div class="tu-card card-purple"><span class="material-symbols-outlined icon">layers</span><div class="tu-info"><span class="label">SKU por Caixa</span><h3 id="wms-skus-cx">--</h3></div></div>
+                        <div class="tu-card card-red" id="card-tarefas-wms"><span class="material-symbols-outlined icon">assignment</span><div class="tu-info"><span class="label">Tarefas WMS (FR e GV)</span><h3 id="wms-tarefas">--</h3></div></div>
+                    </div>
+
+                    <div class="macro-grid">
+                        <div class="macro-box macro-box-fr">
+                            <div class="macro-header"><span class="material-symbols-outlined">conveyor_belt</span> OPERAÇÃO FRACIONADA (FR)</div>
+                            <div class="macro-stats">
+                                <div class="stat-item"><span class="label">Peças</span><strong id="wms-fr-pcs">--</strong><small class="pct" id="wms-fr-pcs-pct">--%</small></div>
+                                <div class="stat-item"><span class="label">Caixas</span><strong id="wms-fr-cxs">--</strong><small class="pct" id="wms-fr-cxs-pct">--%</small></div>
+                                <div class="stat-item"><span class="label">Pç/Cx</span><strong id="wms-fr-pc-cx">--</strong></div>
+                                <div class="stat-item"><span class="label">Tarefas</span><strong id="wms-fr-tar">--</strong></div>
+                            </div>
+                        </div>
+                        <div class="macro-box macro-box-gv">
+                            <div class="macro-header"><span class="material-symbols-outlined">pallet</span> GRANDES VOLUMES (GV)</div>
+                            <div class="macro-stats">
+                                <div class="stat-item"><span class="label">Peças</span><strong id="wms-gv-pcs">--</strong><small class="pct" id="wms-gv-pcs-pct">--%</small></div>
+                                <div class="stat-item"><span class="label">Caixas</span><strong id="wms-gv-cxs">--</strong><small class="pct" id="wms-gv-cxs-pct">--%</small></div>
+                                <div class="stat-item"><span class="label">Pç/Cx</span><strong id="wms-gv-pc-cx">--</strong></div>
+                                <div class="stat-item"><span class="label">Tarefas</span><strong id="wms-gv-tar">--</strong></div>
+                            </div>
+                        </div>
+                        <div class="macro-box macro-box-pc">
+                            <div class="macro-header"><span class="material-symbols-outlined">shopping_cart</span> PICKING CART (PC)</div>
+                            <div class="macro-stats">
+                                <div class="stat-item"><span class="label">Peças</span><strong id="wms-pc-pcs">--</strong><small class="pct" id="wms-pc-pcs-pct">--%</small></div>
+                                <div class="stat-item"><span class="label">Caixas</span><strong id="wms-pc-cxs">--</strong><small class="pct" id="wms-pc-cxs-pct">--%</small></div>
+                                <div class="stat-item"><span class="label">Pç/Cx</span><strong id="wms-pc-pc-cx">--</strong></div>
+                                <div class="stat-item"><span class="label">Tarefas</span><strong id="wms-pc-tar">--</strong></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tu-details-grid" style="margin-top: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="tu-detail-box" style="display:flex; flex-direction:column; height: 230px;">
+                            <h4><span class="material-symbols-outlined">bar_chart</span> Curva de Caixas • Alto Giro</h4>
+                            <div style="flex:1; position:relative;"><canvas id="chartCaixasOutliers"></canvas></div>
+                        </div>
+                        <div class="tu-detail-box" style="display:flex; flex-direction:column; height: 230px;">
+                            <h4><span class="material-symbols-outlined">bar_chart</span> Curva de Caixas • Baixo Giro</h4>
+                            <div style="flex:1; position:relative;"><canvas id="chartCaixasOutras"></canvas></div>
+                        </div>
+                        <div class="tu-detail-box" style="display:flex; flex-direction:column; height: 230px;">
+                            <h4><span class="material-symbols-outlined">stacked_bar_chart</span> Curva de Peças • Alto Giro</h4>
+                            <div style="flex:1; position:relative;"><canvas id="chartPecasOutliers"></canvas></div>
+                        </div>
+                        <div class="tu-detail-box" style="display:flex; flex-direction:column; height: 230px;">
+                            <h4><span class="material-symbols-outlined">stacked_bar_chart</span> Curva de Peças • Baixo Giro</h4>
+                            <div style="flex:1; position:relative;"><canvas id="chartPecasOutras"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- ABA 3: MOVIMENTAÇÕES                       -->
+                <!-- ========================================== -->
+                <div id="tab-movimentacoes" class="tab-panel">
+                    <div class="tu-header">
+                        <div class="tu-title-group">
+                            <h2><span class="material-symbols-outlined">sync_alt</span> Controle de Movimentações</h2>
+                        </div>
+                        <div class="header-badges">
+                            <span class="tu-status-badge">
+                                <span class="status-dot"></span>
+                                <span id="txt-mov-status-sync">Sincronizando...</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="tu-grid-main" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="tu-card card-cyan"><span class="material-symbols-outlined icon">today</span><div class="tu-info"><span class="label">Movimentações do Dia</span><h3 id="mov-card-total-dia">--</h3></div></div>
+                        <div class="tu-card card-yellow"><span class="material-symbols-outlined icon">pending_actions</span><div class="tu-info"><span class="label">Pendentes do Dia</span><h3 id="mov-card-pendentes">--</h3></div></div>
+                        <div class="tu-card card-purple"><span class="material-symbols-outlined icon">history_toggle_off</span><div class="tu-info"><span class="label">Pendências Anteriores</span><h3 id="mov-card-pendentes-antigas">--</h3></div></div>
+                        <div class="tu-card card-red"><span class="material-symbols-outlined icon">sell</span><div class="tu-info"><span class="label">Etiquetas Totais</span><h3 id="mov-card-etiquetas-totais">--</h3></div></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-top: 4px;">
+                        <div class="tu-detail-box box-warning" style="min-width: 0;">
+                            <h4><span class="material-symbols-outlined">list_alt</span> Movimentações Pendentes</h4>
+                            <table class="tu-table">
+                                <thead><tr><th>DATA</th><th style="text-align: left;">ITEM</th><th>DEMANDA</th><th>DE</th><th>PARA</th><th>TIPO DEP.</th></tr></thead>
+                                <tbody id="tbl-mov-pendentes-body"><tr><td colspan="6" style="text-align: center; color: #a0aab5; padding: 15px;">Carregando...</td></tr></tbody>
+                            </table>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 12px; min-width: 0;">
+                            <div class="tu-detail-box box-purple">
+                                <h4><span class="material-symbols-outlined">print</span> Pendente Etiqueta (IE)</h4>
+                                <div style="max-height: 200px; overflow-y: auto; padding-right: 5px;"><table class="tu-table"><thead><tr><th style="text-align: left;">ITEM</th><th>PARA</th></tr></thead><tbody id="tbl-mov-ie-body"></tbody></table></div>
+                            </div>
+                            <div class="tu-detail-box box-red">
+                                <h4><span class="material-symbols-outlined">app_registration</span> Pendente Fixo (CF)</h4>
+                                <div style="max-height: 200px; overflow-y: auto; padding-right: 5px;"><table class="tu-table"><thead><tr><th style="text-align: left;">ITEM</th><th>PARA</th></tr></thead><tbody id="tbl-mov-cf-body"></tbody></table></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- ABA 4: FECHAMENTO DE EXPEDIÇÃO             -->
+                <!-- ========================================== -->
+                <div id="tab-fechamento" class="tab-panel">
+                    <div class="tu-header">
+                        <div class="tu-title-group">
+                            <h2><span class="material-symbols-outlined">done_all</span> Fechamento & Rel. de Bipagem</h2>
+                        </div>
+                        <div class="header-badges">
+                            <span class="tu-status-badge">
+                                <span class="status-dot"></span>
+                                <span id="txt-fechamento-status-sync">Sincronizando...</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="color: #ffffff; font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span class="material-symbols-outlined" style="color: #00d2ff; font-size: 20px;">view_carousel</span>
+                            Status por Atendimento
+                        </h4>
+                        <div id="container-cards-atendimentos" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px;">
+                            <p style="color:#a0aab5; font-size:0.75rem;">Carregando atendimentos em andamento...</p>
+                        </div>
+                    </div>
+
+                    <div class="tu-detail-box box-cyan" style="margin-top: 10px;">
+                        <h4><span class="material-symbols-outlined">list_alt</span> Detalhamento de Carregamento por TU</h4>
+                        <div style="max-height: 420px; overflow-y: auto; padding-right: 5px;">
+                            <table class="tu-table" id="tbl-fechamento">
+                                <thead style="position: sticky; top: 0; z-index: 2;">
+                                    <tr class="table-fechamento-header">
+                                        <th style="text-align: left; padding-left: 8px;">ATENDIMENTO<br><input type="text" class="input-filtro-tabela" onkeyup="filtrarTabelaFechamento()" placeholder="Filtrar..."></th>
+                                        <th style="text-align: left;">CARRETA<br><input type="text" class="input-filtro-tabela" onkeyup="filtrarTabelaFechamento()" placeholder="Filtrar..."></th>
+                                        <th>TU<br><input type="text" class="input-filtro-tabela" onkeyup="filtrarTabelaFechamento()" placeholder="Filtrar..."></th>
+                                        <th>CAIXAS PROCESSADAS<br><input type="text" class="input-filtro-tabela" onkeyup="filtrarTabelaFechamento()" placeholder="Filtrar..."></th>
+                                        <th>PROGRESSO FLUXO<br><input type="text" class="input-filtro-tabela" onkeyup="filtrarTabelaFechamento()" placeholder="Filtrar..."></th>
+                                        <th>STATUS SAP<br><input type="text" class="input-filtro-tabela" onkeyup="filtrarTabelaFechamento()" placeholder="Filtrar..."></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbl-fechamento-body">
+                                    <tr><td colspan="6" style="text-align: center; color: #a0aab5; padding: 15px;">Carregando dados do SAP...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- ABA 5: PD DIGITAL (CONTROLE DE FALTAS)     -->
+                <!-- ========================================== -->
+                <div id="tab-pd" class="tab-panel">
+                    <div class="tu-header">
+                        <div class="tu-title-group">
+                            <h2><span class="material-symbols-outlined" style="color: #e64343;">group</span> Controle de Absenteísmo (PD Digital)</h2>
+                        </div>
+                        <div class="header-badges">
+                            <span class="tu-status-badge" style="color: #e64343; border-color: rgba(230,67,67,0.35); background: rgba(230,67,67,0.1);">
+                                <span class="status-dot" style="background-color: #e64343; box-shadow: 0 0 10px #e64343;"></span>
+                                <span id="txt-pd-status-sync">Sincronizando...</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 4 CARDS NO TOPO (SEM O HEADCOUNT) -->
+                    <div class="tu-grid-main" style="grid-template-columns: repeat(4, 1fr);">
+                        <div class="tu-card card-red">
+                            <span class="material-symbols-outlined icon">person_off</span>
+                            <div class="tu-info"><span class="label">Taxa de Absenteísmo Geral (%)</span><h3 id="pd-taxa-abs">--%</h3><small>Operação Planta</small></div>
+                        </div>
+                        <div class="tu-card card-red" style="border-color: rgba(255, 75, 43, 0.6); box-shadow: inset 0 0 15px rgba(255, 75, 43, 0.1);">
+                            <span class="material-symbols-outlined icon">warning</span>
+                            <div class="tu-info"><span class="label">Déficit de Efetivo (Turnover)</span><h3 id="pd-deficit">--</h3><small>Desligamentos / Abandono</small></div>
+                        </div>
+                        <div class="tu-card card-yellow">
+                            <span class="material-symbols-outlined icon">engineering</span>
+                            <div class="tu-info"><span class="label">Faltas Injustificadas (Dias)</span><h3 id="pd-injustificadas">--</h3><small>Sem Atestado / Motivos Pessoais</small></div>
+                        </div>
+                        <div class="tu-card card-purple">
+                            <span class="material-symbols-outlined icon">fact_check</span>
+                            <div class="tu-info"><span class="label">Ausências Justificadas (Dias)</span><h3 id="pd-justificadas">--</h3><small>Férias / Atestado / Licença</small></div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICOS MENSAIS E DIÁRIO DE SETORES -->
+                    <div class="tu-details-grid" style="margin-top: 6px; display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+                        
+                        <!-- CARD DO GRÁFICO DE SETOR DIÁRIO (COM FILTRO D-1 INTEGRADO) -->
+                        <div class="tu-detail-box" style="display:flex; flex-direction:column; height: 260px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h4 style="margin: 0;"><span class="material-symbols-outlined">bar_chart</span> Absenteísmo Diário por Setor (%)</h4>
+                                <div class="date-picker-wrapper" title="Selecione o Dia para o Gráfico de Setores" style="padding: 2px 8px;">
+                                    <span class="material-symbols-outlined" style="font-size: 15px; color: #00d2ff;">calendar_today</span>
+                                    <input type="date" id="filtro-data-setor" onchange="atualizarGraficoSetorDia()" style="font-size: 0.7rem;">
+                                </div>
+                            </div>
+                            <div style="flex:1; position:relative;"><canvas id="chartPdSetor"></canvas></div>
+                        </div>
+
+                        <!-- GRÁFICO DE EMPRESA -->
+                        <div class="tu-detail-box" style="display:flex; flex-direction:column; height: 260px;">
+                            <h4><span class="material-symbols-outlined">pie_chart</span> Absenteísmo por Empresa (%)</h4>
+                            <div style="flex:1; position:relative;"><canvas id="chartPdEmpresa"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICO DIÁRIO DE LINHAS (COM PORCENTAGEM E LINHA META 4%) -->
+                    <div class="tu-detail-box box-cyan" style="margin-top: 12px; display:flex; flex-direction:column; height: 280px;">
+                        <h4><span class="material-symbols-outlined">timeline</span> Evolução Diária de Absenteísmo (%)</h4>
+                        <div style="flex:1; position:relative;"><canvas id="chartPdDiario"></canvas></div>
+                    </div>
+
+                    <!-- VISÃO LADO A LADO: TURNO VS SETORES VS LÍDERES COM ALTURA FIXA E SCROLLBAR -->
+                    <div class="tu-details-grid" style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1.2fr 1.2fr; gap: 12px;">
+                        
+                        <!-- TABELA TURNOS -->
+                        <div class="tu-detail-box box-cyan" style="height: 250px; display: flex; flex-direction: column;">
+                            <h4>
+                                <div style="display: flex; flex-direction: column;">
+                                    <div style="display: flex; align-items: center; gap: 6px;"><span class="material-symbols-outlined">schedule</span> Absenteísmo por Turno</div>
+                                    <small style="color: #a0aab5; font-size: 0.65rem; margin-top: 2px; margin-left: 28px;">Acumulado do Mês</small>
+                                </div>
+                            </h4>
+                            <div class="custom-scrollbar" style="flex: 1; overflow-y: auto; padding-right: 4px;">
+                                <table class="tu-table">
+                                    <thead style="position: sticky; top: 0; background: #0f172a; z-index: 2;">
+                                        <tr>
+                                            <th style="text-align: left;">TURNO</th>
+                                            <th>FALTAS (DIAS)</th>
+                                            <th>TAXA (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbl-pd-turnos-body">
+                                        <tr><td colspan="3" style="text-align: center; color: #a0aab5; padding: 15px;">Carregando dados...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TABELA DE TODOS OS SETORES -->
+                        <div class="tu-detail-box box-red" style="height: 250px; display: flex; flex-direction: column;">
+                            <h4><span class="material-symbols-outlined">factory</span> 🔴 Absenteísmo por Setor</h4>
+                            <div class="custom-scrollbar" style="flex: 1; overflow-y: auto; padding-right: 4px;">
+                                <table class="tu-table">
+                                    <thead style="position: sticky; top: 0; background: #0f172a; z-index: 2;">
+                                        <tr>
+                                            <th style="text-align: left;">SETOR OFENSOR</th>
+                                            <th>FALTAS</th>
+                                            <th>TAXA (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbl-pd-setores-body">
+                                        <tr><td colspan="3" style="text-align: center; color: #a0aab5; padding: 15px;">Carregando dados...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TABELA DE TODOS OS LÍDERES -->
+                        <div class="tu-detail-box box-purple" style="height: 250px; display: flex; flex-direction: column;">
+                            <h4><span class="material-symbols-outlined">badge</span> 🔴 Absenteísmo por Líder</h4>
+                            <div class="custom-scrollbar" style="flex: 1; overflow-y: auto; padding-right: 4px;">
+                                <table class="tu-table">
+                                    <thead style="position: sticky; top: 0; background: #0f172a; z-index: 2;">
+                                        <tr>
+                                            <th style="text-align: left;">LÍDER OFENSOR</th>
+                                            <th>FALTAS</th>
+                                            <th>TAXA (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbl-pd-lideres-body">
+                                        <tr><td colspan="3" style="text-align: center; color: #a0aab5; padding: 15px;">Carregando dados...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- RODAPÉ E PILARES -->
+    <div class="bar-pilares">
+        <div class="pilar-item"><span class="material-symbols-outlined">shield</span><div class="pilar-text">Visão de <strong>Ponta a Ponta</strong></div></div>
+        <div class="pilar-item"><span class="material-symbols-outlined">verified_user</span><div class="pilar-text">Segurança <strong>de dados</strong></div></div>
+        <div class="pilar-item"><span class="material-symbols-outlined">schedule</span><div class="pilar-text">Informações <strong>em tempo real</strong></div></div>
+        <div class="pilar-item"><span class="material-symbols-outlined">group</span><div class="pilar-text">Equipes <strong>em sincronia</strong></div></div>
+    </div>
+    <footer class="rodape"><p>Desenvolvido para o Setor de Planejamento CEVA Logistics &copy; 2026</p></footer>
+
+    <!-- SCRIPTS MESTRE DO PORTAL -->
+    <script>
+        Chart.defaults.color = '#a0aab5';
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        
+        let chartCaixasOutliers = null, chartCaixasOutras = null;
+        let chartPecasOutliers = null, chartPecasOutras = null;
+        let chartPdSetor = null, chartPdEmpresa = null, chartPdDiario = null;
+
+        let wmsCanalAtual = 'VAREJO';
+        let wmsVisaoAtual = 'REAL_CARTEIRA';
+        let dadosOndasGeral = []; 
+        let dadosOndasDataFiltrada = []; 
+
+        // PLUGIN CUSTOMIZADO CHART.JS: DESENHA VALORES MAIORES E NA COR PRETA PARA CONTRASTE
+        const chartDataLabelsPlugin = {
+            id: 'chartDataLabelsPlugin',
+            afterDatasetsDraw(chart, args, options) {
+                if(chart.config.type === 'line') return; 
+
+                const { ctx } = chart;
+                chart.data.datasets.forEach((dataset, i) => {
+                    const meta = chart.getDatasetMeta(i);
+                    meta.data.forEach((element, index) => {
+                        const data = dataset.data[index];
+                        const abs_data = dataset.absoluteData ? dataset.absoluteData[index] : null;
+                        if (data > 0) {
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            
+                            let x = element.x;
+                            let y = element.y;
+                            
+                            if (chart.config.type === 'bar') { 
+                                y = y + 16; 
+                                ctx.fillStyle = '#000000'; // TEXTO PRETO PARA ALTO CONTRASTE
+                            } 
+                            else if (chart.config.type === 'doughnut') {
+                                const pos = element.tooltipPosition();
+                                x = pos.x; y = pos.y;
+                                ctx.fillStyle = '#ffffff';
+                            }
+
+                            ctx.font = 'bold 12px "Plus Jakarta Sans"';
+                            ctx.fillText(data + '%', x, y - 5);
+                            
+                            if (abs_data !== null) {
+                                ctx.font = 'bold 10px "Plus Jakarta Sans"';
+                                if (chart.config.type === 'bar') ctx.fillStyle = '#111111';
+                                else ctx.fillStyle = '#a0aab5';
+                                ctx.fillText('(' + abs_data + ')', x, y + 9);
+                            }
+                        }
+                    });
+                });
+            }
+        };
+
+        function carregarScriptsSemCache() {
+            const timestamp = new Date().getTime();
+            const scripts = ["dados_tu.js", "dados_movimentacoes.js", "dados_demandas.js", "dados_fechamento.js", "dados_pd.js"];
+            let carregados = 0;
+            scripts.forEach(src => {
+                const script = document.createElement("script");
+                script.src = `${src}?v=${timestamp}`;
+                script.onload = () => { carregados++; if (carregados === scripts.length) carregarDados(); };
+                script.onerror = () => { carregados++; if (carregados === scripts.length) carregarDados(); };
+                document.head.appendChild(script);
+            });
+        }
+
+        function trocarAba(idAba, elBotao) {
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(idAba).classList.add('active');
+            elBotao.classList.add('active');
+        }
+
+        function formatarNumeroInteiro(num) { return (!num || num === 0) ? '0' : num.toLocaleString('pt-BR'); }
+        function setTextoSeguro(id, texto) { const el = document.getElementById(id); if (el) el.textContent = texto; }
+        function setHtmlSeguro(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
+        function setEstiloSeguro(id, prop, valor) { const el = document.getElementById(id); if (el) el.style[prop] = valor; }
+
+        function formatarTextoPendencia(qtd) {
+            if (qtd === 0) return `<small class="carreta-tag ok-tag">SEM PENDÊNCIAS</small>`;
+            return `<small class="carreta-tag pend-tag">${qtd} ${qtd === 1 ? 'TU PENDENTE' : 'TUs PENDENTES'}</small>`;
+        }
+
+        function preencherCardPerfil(prefixo, obj) {
+            if (!obj) return;
+            const canais = ['cart_ln', 'cart_gv', 'var_ln', 'var_gv', 'est_ln', 'est_gv', 'total'];
+            const chaves = ['carteira_ln', 'carteira_gv', 'varejo_ln', 'varejo_gv', 'estojo_ln', 'estojo_gv', 'total_geral'];
+            canais.forEach((c, idx) => {
+                const item = obj[chaves[idx]];
+                if (item) {
+                    setTextoSeguro(`pcs-${c}-${prefixo}`, formatarNumeroInteiro(item.pcs));
+                    setTextoSeguro(`cx-${c}-${prefixo}`, formatarNumeroInteiro(item.cx));
+                    setTextoSeguro(`perf-${c}-${prefixo}`, `${Math.round(item.perfil)}`);
+                }
+            });
+        }
+
+        function filtrarTabelaFechamento() {
+            const tbody = document.getElementById('tbl-fechamento-body');
+            const trs = tbody.getElementsByTagName('tr');
+            const inputs = document.querySelectorAll('.input-filtro-tabela');
+            for (let i = 0; i < trs.length; i++) {
+                let showRow = true;
+                const tds = trs[i].getElementsByTagName('td');
+                if (tds.length <= 1) continue;
+                inputs.forEach((input, index) => {
+                    const filterVal = input.value.toLowerCase().trim();
+                    if (filterVal && tds[index]) {
+                        const cellText = tds[index].textContent.toLowerCase();
+                        if (!cellText.includes(filterVal)) showRow = false;
+                    }
+                });
+                trs[i].style.display = showRow ? '' : 'none';
+            }
+        }
+
+        function aplicarFiltroMesTU() {
+            const inputMes = document.getElementById('filtro-mes-tu');
+            if (!inputMes || !inputMes.value || typeof dadosDashboard === 'undefined') return;
+            const mesAnoSel = inputMes.value;
+            const totaisMes = dadosDashboard.totais_por_mes || {};
+            const [ano, mes] = mesAnoSel.split('-');
+            const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            const nomeMesExtenso = `${nomesMeses[parseInt(mes) - 1]} / ${ano}`;
+            if (totaisMes[mesAnoSel]) {
+                setTextoSeguro('caixas-mes', formatarNumeroInteiro(totaisMes[mesAnoSel].caixas));
+                setTextoSeguro('pecas-mes', formatarNumeroInteiro(totaisMes[mesAnoSel].pecas));
+                setTextoSeguro('sub-caixas-mes', `Total de ${nomeMesExtenso}`);
+                setTextoSeguro('sub-pecas-mes', `Total de ${nomeMesExtenso}`);
+            } else {
+                setTextoSeguro('caixas-mes', '0'); setTextoSeguro('pecas-mes', '0');
+                setTextoSeguro('sub-caixas-mes', `Sem dados em ${nomeMesExtenso}`);
+                setTextoSeguro('sub-pecas-mes', `Sem dados em ${nomeMesExtenso}`);
+            }
+        }
+
+        function aplicarFiltroDataWMS() {
+            const dataSelecionada = document.getElementById('filtro-data-wms').value;
+            dadosOndasDataFiltrada = [];
+            const canaisUnicos = [...new Set(dadosOndasGeral.map(o => o.onda_atual))];
+            canaisUnicos.forEach(canal => {
+                const ondasCanal = dadosOndasGeral.filter(o => o.onda_atual === canal && o.data_onda <= dataSelecionada);
+                if (ondasCanal.length > 0) {
+                    ondasCanal.sort((a, b) => b.data_onda.localeCompare(a.data_onda));
+                    dadosOndasDataFiltrada.push(ondasCanal[0]);
+                }
+            });
+            const canaisFixos = ['MGI', 'MGC', 'SPI', 'SPC', 'VAREJO'];
+            canaisFixos.forEach(canal => {
+                let isActive = false;
+                if (typeof dadosDashboard !== 'undefined' && dadosDashboard.atendimentos_em_andamento) {
+                    isActive = dadosDashboard.atendimentos_em_andamento.some(a => a.includes(canal));
+                }
+                const dot = document.getElementById('dot-' + canal);
+                if (dot) dot.className = isActive ? 'status-dot-on' : 'status-dot-off';
+            });
+            renderizarCardsWMS();
+        }
+
+        function selecionarCanalWMS(canal, btnElement) {
+            document.querySelectorAll('.btn-wms-onda').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            wmsCanalAtual = canal;
+            const btnPreviaCarteira = document.getElementById('btn-previa-carteira');
+            const btnPreviaKit = document.getElementById('btn-previa-kit');
+            const btnRealKit = document.getElementById('btn-real-kit');
+            const btnRealCarteira = document.getElementById('btn-real-carteira');
+            if (canal === 'VAREJO') {
+                if (btnPreviaCarteira) btnPreviaCarteira.style.display = 'none';
+                if (btnPreviaKit) btnPreviaKit.style.display = 'none';
+                if (btnRealKit) btnRealKit.style.display = 'none';
+                if (btnRealCarteira) btnRealCarteira.innerHTML = "REAL VAREJO";
+                mudarVisaoWMS('REAL_CARTEIRA');
+            } else {
+                if (btnPreviaCarteira) btnPreviaCarteira.style.display = 'inline-block';
+                if (btnPreviaKit) btnPreviaKit.style.display = 'inline-block';
+                if (btnRealKit) btnRealKit.style.display = 'inline-block';
+                if (btnRealCarteira) btnRealCarteira.innerHTML = "REAL CARTEIRA";
+                if(wmsVisaoAtual !== 'PREVIA_CARTEIRA' && wmsVisaoAtual !== 'PREVIA_KIT' && wmsVisaoAtual !== 'REAL_KIT') mudarVisaoWMS('REAL_CARTEIRA');
+                else renderizarCardsWMS();
+            }
+        }
+
+        function mudarVisaoWMS(visao) {
+            document.querySelectorAll('.btn-sub-tab').forEach(b => b.classList.remove('active'));
+            let btnId = '';
+            if(visao === 'PREVIA_CARTEIRA') btnId = 'btn-previa-carteira';
+            if(visao === 'REAL_CARTEIRA') btnId = 'btn-real-carteira';
+            if(visao === 'PREVIA_KIT') btnId = 'btn-previa-kit';
+            if(visao === 'REAL_KIT') btnId = 'btn-real-kit';
+            if(document.getElementById(btnId)) document.getElementById(btnId).classList.add('active');
+            wmsVisaoAtual = visao;
+            renderizarCardsWMS();
+        }
+
+        function desenharGraficosChartJS(todasEstacoes) {
+            if (!todasEstacoes || todasEstacoes.length === 0) {
+                if (chartCaixasOutliers) chartCaixasOutliers.destroy(); 
+                if (chartCaixasOutras) chartCaixasOutras.destroy(); 
+                if (chartPecasOutliers) chartPecasOutliers.destroy();
+                if (chartPecasOutras) chartPecasOutras.destroy();
+                return;
+            }
+            const estEspeciaisData = todasEstacoes.filter(e => { const cod = String(e.estacao).trim().replace(/[^\d]/g, '').padStart(2, '0'); return cod === '04' || cod === '07'; });
+            const estOutrasData = todasEstacoes.filter(e => { const cod = String(e.estacao).trim().replace(/[^\d]/g, '').padStart(2, '0'); return cod !== '04' && cod !== '07'; });
+
+            function renderBarChart(canvasId, currentChart, dataList, valueKey, bgColor, borderColor, maxThickness = null) {
+                const elCanvas = document.getElementById(canvasId);
+                if (!elCanvas) return null;
+                const ctx = elCanvas.getContext('2d');
+                if (currentChart) currentChart.destroy();
+                const labels = dataList.map(e => e.estacao);
+                const values = dataList.map(e => e[valueKey]);
+                const datasetConfig = { data: values, backgroundColor: bgColor, borderColor: borderColor, borderWidth: 1, borderRadius: 4 };
+                if (maxThickness) datasetConfig.maxBarThickness = maxThickness;
+                return new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [datasetConfig] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, beginAtZero: true }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } } } });
+            }
+            chartCaixasOutliers = renderBarChart('chartCaixasOutliers', chartCaixasOutliers, estEspeciaisData, 'cxs', 'rgba(0, 210, 255, 0.6)', 'rgba(0, 210, 255, 1)', 45);
+            chartCaixasOutras   = renderBarChart('chartCaixasOutras', chartCaixasOutras, estOutrasData, 'cxs', 'rgba(0, 210, 255, 0.6)', 'rgba(0, 210, 255, 1)');
+            chartPecasOutliers  = renderBarChart('chartPecasOutliers', chartPecasOutliers, estEspeciaisData, 'pcs', 'rgba(155, 89, 182, 0.6)', 'rgba(155, 89, 182, 1)', 45);
+            chartPecasOutras    = renderBarChart('chartPecasOutras', chartPecasOutras, estOutrasData, 'pcs', 'rgba(155, 89, 182, 0.6)', 'rgba(155, 89, 182, 1)');
+        }
+
+        function renderizarCardsWMS() {
+            let ondaDados = dadosOndasDataFiltrada.find(o => o.onda_atual === wmsCanalAtual);
+            if (!ondaDados) ondaDados = {};
+            let dadosVisao = {}, est_cx = 0, skus_cx = 0, todas_est = [];
+            if (wmsVisaoAtual === 'PREVIA_CARTEIRA') { dadosVisao = ondaDados.previa_carteira || {}; est_cx = ondaDados.perfil_est_cx_pc || 0; skus_cx = ondaDados.perfil_skus_cx_pc || 0; todas_est = ondaDados.todas_estacoes_previa_carteira || []; } 
+            else if (wmsVisaoAtual === 'REAL_CARTEIRA') { dadosVisao = ondaDados.real_carteira || {}; est_cx = ondaDados.perfil_est_cx_rc || 0; skus_cx = ondaDados.perfil_skus_cx_rc || 0; todas_est = ondaDados.todas_estacoes_real_carteira || []; } 
+            else if (wmsVisaoAtual === 'PREVIA_KIT') { dadosVisao = ondaDados.previa_kit || {}; est_cx = ondaDados.perfil_est_cx_pk || 0; skus_cx = ondaDados.perfil_skus_cx_pk || 0; todas_est = ondaDados.todas_estacoes_previa_kit || []; } 
+            else if (wmsVisaoAtual === 'REAL_KIT') { dadosVisao = ondaDados.real_kit || {}; est_cx = ondaDados.perfil_est_cx_rk || 0; skus_cx = ondaDados.perfil_skus_cx_rk || 0; todas_est = ondaDados.todas_estacoes_real_kit || []; }
+
+            const cardAderencia = document.getElementById('card-aderencia-wms');
+            const gridWmsIndicadores = document.getElementById('grid-wms-indicadores');
+            if (wmsCanalAtual === 'VAREJO') {
+                if (cardAderencia) cardAderencia.style.display = 'none';
+                if (gridWmsIndicadores) gridWmsIndicadores.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            } else {
+                if (cardAderencia) cardAderencia.style.display = 'flex';
+                if (gridWmsIndicadores) gridWmsIndicadores.style.gridTemplateColumns = 'repeat(4, 1fr)';
+                let adValor = 0;
+                if (wmsVisaoAtual.includes('KIT')) adValor = ondaDados.aderencia_pcs_kit || 0; else adValor = ondaDados.aderencia_pcs_carteira || 0;
+                setTextoSeguro('wms-aderencia', `${adValor}%`); setEstiloSeguro('bar-aderencia-fill', 'width', `${adValor}%`);
+            }
+            setTextoSeguro('wms-tarefas', formatarNumeroInteiro(dadosVisao.tar || 0));
+
+            const fr = dadosVisao.fr || {pcs: 0, cxs: 0, pc_cx: 0, tar: 0}; 
+            const gv = dadosVisao.gv || {pcs: 0, cxs: 0, pc_cx: 0, tar: 0}; 
+            const pc = dadosVisao.pc || {pcs: 0, cxs: 0, pc_cx: 0, tar: 0};
+            const totPcs = (fr.pcs || 0) + (gv.pcs || 0) + (pc.pcs || 0); const totCxs = (fr.cxs || 0) + (gv.cxs || 0) + (pc.cxs || 0);
+
+            setTextoSeguro('wms-fr-pcs', formatarNumeroInteiro(fr.pcs || 0)); setTextoSeguro('wms-fr-pcs-pct', `${totPcs>0 ? ((fr.pcs/totPcs)*100).toFixed(1) : '0'}%`);
+            setTextoSeguro('wms-fr-cxs', formatarNumeroInteiro(fr.cxs || 0)); setTextoSeguro('wms-fr-cxs-pct', `${totCxs>0 ? ((fr.cxs/totCxs)*100).toFixed(1) : '0'}%`);
+            setTextoSeguro('wms-fr-pc-cx', fr.pc_cx || 0); setTextoSeguro('wms-fr-tar', formatarNumeroInteiro(fr.tar || 0));
+
+            setTextoSeguro('wms-gv-pcs', formatarNumeroInteiro(gv.pcs || 0)); setTextoSeguro('wms-gv-pcs-pct', `${totPcs>0 ? ((gv.pcs/totPcs)*100).toFixed(1) : '0'}%`);
+            setTextoSeguro('wms-gv-cxs', formatarNumeroInteiro(gv.cxs || 0)); setTextoSeguro('wms-gv-cxs-pct', `${totCxs>0 ? ((gv.cxs/totCxs)*100).toFixed(1) : '0'}%`);
+            setTextoSeguro('wms-gv-pc-cx', gv.pc_cx || 0); setTextoSeguro('wms-gv-tar', formatarNumeroInteiro(gv.tar || 0));
+
+            setTextoSeguro('wms-pc-pcs', formatarNumeroInteiro(pc.pcs || 0)); setTextoSeguro('wms-pc-pcs-pct', `${totPcs>0 ? ((pc.pcs/totPcs)*100).toFixed(1) : '0'}%`);
+            setTextoSeguro('wms-pc-cxs', formatarNumeroInteiro(pc.cxs || 0)); setTextoSeguro('wms-pc-cxs-pct', `${totCxs>0 ? ((pc.cxs/totCxs)*100).toFixed(1) : '0'}%`);
+            setTextoSeguro('wms-pc-pc-cx', pc.pc_cx || 0); setTextoSeguro('wms-pc-tar', formatarNumeroInteiro(pc.tar || 0));
+
+            setTextoSeguro('wms-tot-pcs', formatarNumeroInteiro(totPcs)); setTextoSeguro('wms-tot-cxs', formatarNumeroInteiro(totCxs));
+            setTextoSeguro('wms-est-cx', est_cx); setTextoSeguro('wms-skus-cx', skus_cx);
+            desenharGraficosChartJS(todas_est);
+        }
+
+        // ==========================================
+        // ATUALIZAÇÃO DINÂMICA DO GRÁFICO DE SETORES
+        // ==========================================
+        function atualizarGraficoSetorDia() {
+            const elInput = document.getElementById('filtro-data-setor');
+            if (!elInput || !elInput.value || typeof dadosPD === 'undefined' || !dadosPD.grafico_setor_map) return;
+            
+            const dataSel = elInput.value;
+            const dadosDia = dadosPD.grafico_setor_map[dataSel] || { labels: [], data: [], absolutos: [] };
+            
+            const elSetor = document.getElementById('chartPdSetor');
+            if (elSetor) {
+                const ctx = elSetor.getContext('2d');
+                if (chartPdSetor) chartPdSetor.destroy();
+                chartPdSetor = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: dadosDia.labels,
+                        datasets: [{
+                            data: dadosDia.data,
+                            absoluteData: dadosDia.absolutos, 
+                            backgroundColor: 'rgba(230, 67, 67, 0.75)',
+                            borderColor: 'rgba(230, 67, 67, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false, 
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return c.raw + '%'; } } } },
+                        scales: { 
+                            y: { display: false, beginAtZero: true }, 
+                            x: { grid: { display: false }, ticks: { font: { size: 10 } } } 
+                        }
+                    },
+                    plugins: [chartDataLabelsPlugin]
+                });
+            }
+        }
+
+        // ==========================================
+        // DESENHAR GRÁFICOS PD DIGITAL
+        // ==========================================
+        function desenharGraficosPD(dadosSetor, dadosEmpresa, dadosDiario) {
+            const elInput = document.getElementById('filtro-data-setor');
+            if (elInput && dadosPD && dadosPD.data_padrao_setor && !elInput.value) {
+                elInput.value = dadosPD.data_padrao_setor;
+            }
+            atualizarGraficoSetorDia();
+
+            const elEmpresa = document.getElementById('chartPdEmpresa');
+            if (elEmpresa && dadosEmpresa) {
+                const ctx = elEmpresa.getContext('2d');
+                if (chartPdEmpresa) chartPdEmpresa.destroy();
+                chartPdEmpresa = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: dadosEmpresa.labels,
+                        datasets: [{
+                            data: dadosEmpresa.data,
+                            absoluteData: dadosEmpresa.absolutos, 
+                            backgroundColor: ['rgba(0, 210, 255, 0.7)', 'rgba(0, 176, 155, 0.7)', 'rgba(155, 89, 182, 0.7)', 'rgba(246, 185, 59, 0.7)'],
+                            borderColor: 'rgba(15, 23, 42, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { position: 'right', labels: { color: '#a0aab5', font: { size: 10 } } },
+                            tooltip: { callbacks: { label: function(c) { return c.raw + '%'; } } }
+                        },
+                        cutout: '50%' 
+                    },
+                    plugins: [chartDataLabelsPlugin] 
+                });
+            }
+
+            // GRÁFICO DIÁRIO COM PORCENTAGEM E LINHA DE META (4%)
+            const elDiario = document.getElementById('chartPdDiario');
+            if (elDiario && dadosDiario) {
+                const ctx = elDiario.getContext('2d');
+                if (chartPdDiario) chartPdDiario.destroy();
+                chartPdDiario = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dadosDiario.labels, 
+                        datasets: dadosDiario.datasets
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        elements: {
+                            line: { tension: 0.4 }, 
+                            point: { radius: 3, hitRadius: 10, hoverRadius: 5 }
+                        },
+                        plugins: { 
+                            legend: { position: 'top', labels: { color: '#a0aab5', font: { size: 11 }, usePointStyle: true, boxWidth: 8 } },
+                            tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + c.raw + '%'; } } }
+                        },
+                        scales: { 
+                            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, beginAtZero: true, ticks: { callback: function(val) { return val + '%'; } } }, 
+                            x: { grid: { color: 'rgba(255, 255, 255, 0.02)' }, ticks: { font: { size: 10 } } } 
+                        }
+                    }
+                });
+            }
+        }
+
+        // ==========================================
+        // CARREGADOR MESTRE DE DADOS
+        // ==========================================
+        function carregarDados() {
+            
+            if (typeof dadosDashboard !== 'undefined') {
+                const dados = dadosDashboard;
+                setTextoSeguro('txt-status-sync', `LIVE • ${dados.atualizado_em || ''}`);
+
+                const inputMes = document.getElementById('filtro-mes-tu');
+                if (inputMes && !inputMes.value) {
+                    const hoje = new Date();
+                    const a = hoje.getFullYear();
+                    const m = String(hoje.getMonth() + 1).padStart(2, '0');
+                    inputMes.value = `${a}-${m}`;
+                }
+
+                setTextoSeguro('caixas-mes', formatarNumeroInteiro(dados.caixas_total_mes));
+                setTextoSeguro('pecas-mes', formatarNumeroInteiro(dados.pecas_total_mes));
+                setTextoSeguro('tus-pendentes', `${dados.pendencias_por_canal ? (dados.pendencias_por_canal.varejo + dados.pendencias_por_canal.carteira + dados.pendencias_por_canal.estojo + (dados.pendencias_por_canal.outras || 0)) : (dados.carretas_pendentes || 0)}`);
+                setTextoSeguro('sub-tus', `De ${dados.total_tus || 0} TUs na Janela`);
+                setTextoSeguro('caixas-pendentes', formatarNumeroInteiro(dados.caixas_pendentes));
+                if(dados.caixas_ln_pend !== undefined && dados.caixas_gv_pend !== undefined) setTextoSeguro('sub-caixas', `LN: ${formatarNumeroInteiro(dados.caixas_ln_pend)} | GV: ${formatarNumeroInteiro(dados.caixas_gv_pend)}`);
+                setTextoSeguro('pecas-pendentes', formatarNumeroInteiro(dados.pecas_pendentes));
+                if(dados.pecas_ln_pend !== undefined && dados.pecas_gv_pend !== undefined) setTextoSeguro('sub-pecas', `LN: ${formatarNumeroInteiro(dados.pecas_ln_pend)} | GV: ${formatarNumeroInteiro(dados.pecas_gv_pend)}`);
+                setTextoSeguro('carretas-pendentes', `${dados.carretas_pendentes || 0}`);
+                
+                const pct = dados.progresso_pct || 0;
+                setTextoSeguro('progresso-pct', `${pct}%`); setEstiloSeguro('bar-progresso-fill', 'width', `${pct}%`);
+
+                if (dados.proxima_carteira) { setTextoSeguro('fifo-cart-title', `${dados.proxima_carteira.carreta} (${dados.proxima_carteira.tu_resumida})`); setTextoSeguro('fifo-cart-uf', dados.proxima_carteira.uf); }
+                if (dados.proxima_varejo) { setTextoSeguro('fifo-var-title', `${dados.proxima_varejo.carreta} (${dados.proxima_varejo.tu_resumida})`); setTextoSeguro('fifo-var-uf', dados.proxima_varejo.uf); }
+                if (dados.proxima_estojo) { setTextoSeguro('fifo-est-title', `${dados.proxima_estojo.carreta} (${dados.proxima_estojo.tu_resumida})`); setTextoSeguro('fifo-est-uf', dados.proxima_estojo.uf); }
+
+                if (dados.perfis_geral) preencherCardPerfil('tot', dados.perfis_geral);
+                if (dados.perfis_pendentes) preencherCardPerfil('pend', dados.perfis_pendentes);
+                
+                if (dados.atendimentos_em_andamento) setTextoSeguro('txt-atendimentos-andamento', dados.atendimentos_em_andamento.join(', '));
+                if (dados.alertas_atraso) setTextoSeguro('txt-alertas-atraso', dados.alertas_atraso.join(' | '));
+                
+                if (dados.pendencias_por_canal) {
+                    setHtmlSeguro('pend-canal-estojo', formatarTextoPendencia(dados.pendencias_por_canal.estojo));
+                    setHtmlSeguro('pend-canal-carteira', formatarTextoPendencia(dados.pendencias_por_canal.carteira));
+                    setHtmlSeguro('pend-canal-varejo', formatarTextoPendencia(dados.pendencias_por_canal.varejo));
+                    setHtmlSeguro('pend-canal-outras', formatarTextoPendencia(dados.pendencias_por_canal.outras || 0));
+                }
+            }
+
+            if (typeof dadosDemandaWMS !== 'undefined') {
+                dadosOndasGeral = dadosDemandaWMS.ondas || [];
+                setTextoSeguro('txt-wms-status-sync', `LIVE • ${dadosDemandaWMS.atualizado_em || ''}`);
+
+                const inputData = document.getElementById('filtro-data-wms');
+                if (!inputData.value) {
+                    const hoje = new Date();
+                    const ano = hoje.getFullYear();
+                    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                    const dia = String(hoje.getDate()).padStart(2, '0');
+                    inputData.value = `${ano}-${mes}-${dia}`;
+                }
+                aplicarFiltroDataWMS();
+            }
+
+            if (typeof dadosMovimentacoes !== 'undefined') {
+                const mov = dadosMovimentacoes;
+                setTextoSeguro('txt-mov-status-sync', `LIVE • ${mov.atualizado_em || ''}`);
+                setTextoSeguro('mov-card-total-dia', formatarNumeroInteiro(mov.total_dia));
+                setTextoSeguro('mov-card-pendentes', formatarNumeroInteiro(mov.pendentes_hoje));
+                setTextoSeguro('mov-card-pendentes-antigas', formatarNumeroInteiro(mov.pendentes_antigas));
+                setEstiloSeguro('mov-card-pendentes-antigas', 'color', (mov.pendentes_antigas > 0) ? '#ff4b2b' : '#00b09b');
+                setTextoSeguro('mov-card-etiquetas-totais', formatarNumeroInteiro(mov.etiquetas_totais));
+
+                const tbody = document.getElementById('tbl-mov-pendentes-body');
+                if (tbody) {
+                    if (mov.tabela_pendentes && mov.tabela_pendentes.length > 0) {
+                        let linhas = '';
+                        mov.tabela_pendentes.forEach(i => { 
+                            linhas += `<tr><td style="font-weight:700; color:#f6b93b;">${i.data}</td><td>${i.item}</td><td><span class="carreta-tag" style="color:#00d2ff;">${i.demanda}</span></td><td>${i.de}</td><td><span style="color:#00d2ff;font-weight:700;">${i.para}</span></td><td>${i.tipo_dep}</td></tr>`; 
+                        });
+                        tbody.innerHTML = linhas;
+                    } else tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#00b09b;">✨ Não há pendências</td></tr>`;
+                }
+                const tbodyIE = document.getElementById('tbl-mov-ie-body');
+                if (tbodyIE) {
+                    if (mov.tabela_ie && mov.tabela_ie.length > 0) tbodyIE.innerHTML = mov.tabela_ie.map(i => `<tr><td style="color:#fff;">${i.item}</td><td><span class="val">${i.para}</span></td></tr>`).join('');
+                    else tbodyIE.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#00b09b;">✅ Tudo Impresso</td></tr>`;
+                }
+                const tbodyCF = document.getElementById('tbl-mov-cf-body');
+                if (tbodyCF) {
+                    if (mov.tabela_cf && mov.tabela_cf.length > 0) tbodyCF.innerHTML = mov.tabela_cf.map(i => `<tr><td style="color:#fff;">${i.item}</td><td><span class="val">${i.para}</span></td></tr>`).join('');
+                    else tbodyCF.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#00b09b;">✅ Sem pendências</td></tr>`;
+                }
+            }
+
+            if (typeof dadosFechamento !== 'undefined') {
+                const fech = dadosFechamento;
+                setTextoSeguro('txt-fechamento-status-sync', `LIVE • ${fech.atualizado_em || ''}`);
+
+                const containerAtend = document.getElementById('container-cards-atendimentos');
+                if (containerAtend && fech.cards_atendimentos) {
+                    let htmlCards = '';
+                    Object.keys(fech.cards_atendimentos).forEach(atend => {
+                        const item = fech.cards_atendimentos[atend];
+                        let badgeColor = '#00d2ff'; let badgeBg = 'rgba(0, 210, 255, 0.12)'; let badgeBorder = 'rgba(0, 210, 255, 0.3)';
+                        if (item.status_atend === 'FINALIZADO') { badgeColor = '#00b09b'; badgeBg = 'rgba(0, 176, 155, 0.12)'; badgeBorder = 'rgba(0, 176, 155, 0.3)'; } 
+                        else if (item.status_atend === 'PENDENTE') { badgeColor = '#f6b93b'; badgeBg = 'rgba(246, 185, 59, 0.12)'; badgeBorder = 'rgba(246, 185, 59, 0.3)'; }
+
+                        const totalProc = (item.loaded_cxs || 0) + (item.rampa_cxs || 0);
+
+                        htmlCards += `
+                            <div class="tu-detail-box" style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(0, 210, 255, 0.3); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span class="material-symbols-outlined" style="color: #00d2ff; font-size: 20px;">local_shipping</span>
+                                        <span style="font-size: 0.95rem; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">${atend}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span style="font-size: 0.7rem; font-weight: 800; color: ${badgeColor}; background: ${badgeBg}; padding: 3px 8px; border-radius: 6px; border: 1px solid ${badgeBorder};">${item.status_atend}</span>
+                                        <span style="font-size: 0.82rem; font-weight: 800; color: ${badgeColor}; background: ${badgeBg}; padding: 3px 10px; border-radius: 12px; border: 1px solid ${badgeBorder};">${item.pct}% FLUXO</span>
+                                    </div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #a0aab5;">
+                                    <span>Total Caixas: <strong style="color: #fff;">${formatarNumeroInteiro(item.total_cxs)}</strong></span>
+                                    <span>Processadas: <strong style="color: #00d2ff;">${formatarNumeroInteiro(totalProc)}</strong></span>
+                                    <span>Pendentes: <strong style="color: #f6b93b;">${formatarNumeroInteiro(item.pending_cxs)}</strong></span>
+                                </div>
+                                <div class="progress-bar-container" style="height: 6px; margin-top: 0;">
+                                    <div class="progress-bar-fill" style="width: ${item.pct}%; background: ${item.pct === 100 ? '#00b09b' : 'linear-gradient(90deg, #00b09b, #00d2ff)'};"></div>
+                                </div>
+                                <table class="tu-table" style="font-size: 0.68rem; background: rgba(0,0,0,0.25); border-radius: 8px; overflow: hidden; margin-top: 2px;">
+                                    <thead><tr style="background: rgba(255,255,255,0.03);"><th style="text-align: left; padding-left: 8px;">CAIXAS</th><th>GV</th><th>LN</th></tr></thead>
+                                    <tbody>
+                                        <tr><td style="color: #00b09b; font-weight:700; text-align: left; padding-left: 8px;">CONCLUÍDAS</td><td><span class="val" style="color: #00b09b;">${formatarNumeroInteiro(item.finalizadas_gv_cx)}</span></td><td><span class="val" style="color: #00b09b;">${formatarNumeroInteiro(item.finalizadas_fr_cx)}</span></td></tr>
+                                        <tr><td style="color: #f6b93b; font-weight:700; text-align: left; padding-left: 8px;">PENDENTES</td><td><span class="val" style="color: #f6b93b;">${formatarNumeroInteiro(item.pendentes_gv_cx)}</span></td><td><span class="val" style="color: #f6b93b;">${formatarNumeroInteiro(item.pendentes_fr_cx)}</span></td></tr>
+                                    </tbody>
+                                </table>
+                                <div style="display: flex; justify-content: space-between; background: rgba(15, 23, 42, 0.85); padding: 8px 12px; border-radius: 8px; font-size: 0.72rem; border: 1px solid rgba(255, 255, 255, 0.08);">
+                                    <span style="color: #ffffff; display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #00b09b; border-radius: 50%; display: inline-block;"></span> Carregado: <strong style="color: #00b09b; font-size: 0.8rem;">${formatarNumeroInteiro(item.loaded_cxs)}</strong></span>
+                                    <span style="color: #ffffff; display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: #00d2ff; border-radius: 50%; display: inline-block;"></span> Rampa OK: <strong style="color: #00d2ff; font-size: 0.8rem;">${formatarNumeroInteiro(item.rampa_cxs)}</strong></span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    containerAtend.innerHTML = htmlCards || '<p style="color:#a0aab5; font-size:0.75rem;">Nenhum atendimento ativo no momento.</p>';
+                }
+
+                const tbodyFech = document.getElementById('tbl-fechamento-body');
+                if (tbodyFech) {
+                    if (fech.tabela && fech.tabela.length > 0) {
+                        let linhasFech = '';
+                        fech.tabela.forEach(i => {
+                            let tagColor = '#00d2ff'; let tagBg = 'rgba(0, 210, 255, 0.12)';
+                            if (i.status === 'FINALIZADA') { tagColor = '#00b09b'; tagBg = 'rgba(0, 176, 155, 0.12)'; } 
+                            else if (i.status === 'EM RAMPA') { tagColor = '#3b82f6'; tagBg = 'rgba(59, 130, 246, 0.12)'; } 
+                            else if (i.status === 'PENDENTE') { tagColor = '#f6b93b'; tagBg = 'rgba(246, 185, 59, 0.12)'; }
+                            
+                            const carregadoVal = i.caixas_carregadas || 0; const rampaVal = i.caixas_rampa || 0;
+                            const totalProc = i.caixas_processadas || (carregadoVal + rampaVal);
+
+                            linhasFech += `
+                                <tr>
+                                    <td style="font-weight:700; color:#00d2ff; text-align: left; padding-left: 8px;">${i.atendimento}</td>
+                                    <td style="text-align: left; color:#ffffff;">${i.carreta}</td>
+                                    <td style="font-weight:700;">${i.tu}</td>
+                                    <td>
+                                        <div><strong style="color:#fff;">${formatarNumeroInteiro(totalProc)}</strong> / ${formatarNumeroInteiro(i.total_caixas)}</div>
+                                        <div style="font-size:0.64rem; color:#cbd5e1; margin-top:2px; font-weight:600;"><span style="color:#00b09b;">${carregadoVal} Carregado</span> | <span style="color:#00d2ff;">${rampaVal} Rampa OK</span></div>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                            <span>${i.pct}%</span>
+                                            <div style="width: 60px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;"><div style="width: ${i.pct}%; height: 100%; background: ${tagColor};"></div></div>
+                                        </div>
+                                    </td>
+                                    <td><span style="color: ${tagColor}; background: ${tagBg}; padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700;">${i.status}</span></td>
+                                </tr>`;
+                        });
+                        tbodyFech.innerHTML = linhasFech;
+                    } else tbodyFech.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#00b09b;">✨ Nenhuma TU pendente ou na linha no momento</td></tr>`;
+                }
+            }
+
+            // ------------------ ABA 5: PD DIGITAL ------------------
+            if (typeof dadosPD === 'undefined') {
+                window.dadosPD = {
+                    atualizado_em: "Mock Data (Aguardando Python)",
+                    taxa_abs: 9.7, deficit: 90, fi_dias: 268, fj_dias: 233,
+                    data_padrao_setor: '2026-09-29',
+                    grafico_setor_map: {
+                        '2026-09-29': { labels: ['FECHAMENTO', 'EXPEDICAO', 'SEPARACAO', 'REABASTECIMENTO'], data: [9.3, 6.8, 5.0, 4.8], absolutos: [4, 3, 3, 1] }
+                    },
+                    grafico_setor: { labels: ['FECHAMENTO', 'EXPEDICAO', 'SEPARACAO', 'REABASTECIMENTO'], data: [9.3, 6.8, 5.0, 4.8], absolutos: [4, 3, 3, 1] },
+                    grafico_empresa: { labels: ['America', 'Meet', 'CEVA', 'Pactual'], data: [11.9, 10.3, 9.4, 7.7], absolutos: [178, 121, 506, 106] },
+                    
+                    grafico_diario: {
+                        labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15'],
+                        datasets: [
+                            { label: '1º Turno', data: [8.6, 9.7, 9.3, 7.6, 9.2, 0, 6.6, 3.2, 8.0, 6.4, 6.9, 0, 8.2, 5.7, 6.1], borderColor: '#00d2ff', backgroundColor: '#00d2ff', borderWidth: 2 },
+                            { label: '2º Turno', data: [5.2, 6.1, 5.8, 4.9, 5.5, 0, 4.2, 2.1, 5.0, 4.1, 4.5, 0, 5.8, 3.9, 4.2], borderColor: '#f6b93b', backgroundColor: '#f6b93b', borderWidth: 2 },
+                            { label: '3º Turno', data: [11.2, 12.5, 11.8, 10.1, 11.0, 0, 9.5, 6.4, 10.8, 9.2, 10.1, 0, 11.5, 8.7, 9.1], borderColor: '#e64343', backgroundColor: '#e64343', borderWidth: 2 },
+                            { label: 'Meta (4%)', data: [4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0], borderColor: '#00b09b', borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false }
+                        ]
+                    },
+
+                    tabela_turnos: [
+                        {turno: '3º Turno', faltas: 424, taxa: 13.0},
+                        {turno: '2º Turno', faltas: 332, taxa: 9.5},
+                        {turno: '1º Turno', faltas: 223, taxa: 6.8}
+                    ],
+                    todos_setores: [
+                        {setor: 'SEPARAÇÃO', faltas: 485, taxa: 12.1},
+                        {setor: 'EXPEDIÇÃO', faltas: 140, taxa: 8.4},
+                        {setor: 'FECHAMENTO', faltas: 133, taxa: 8.4},
+                        {setor: 'REABASTECIMENTO', faltas: 133, taxa: 10.1},
+                        {setor: 'RECEBIMENTO', faltas: 71, taxa: 5.5},
+                        {setor: 'INVENTÁRIO', faltas: 17, taxa: 10.0}
+                    ],
+                    todos_lideres: [
+                        {lider: 'LUIS PAULO REIS', faltas: 485, taxa: 12.1},
+                        {lider: 'TARCISIO RICARDO MARTINS CLARO', faltas: 140, taxa: 8.4},
+                        {lider: 'RICARDO EUGENIO LAURINDO', faltas: 133, taxa: 8.4},
+                        {lider: 'FLAVIO MARTINS RUFINO', faltas: 133, taxa: 10.1},
+                        {lider: 'MARCIO VINICIO AMANCIO JUNIOR', faltas: 71, taxa: 5.5},
+                        {lider: 'MARIA GABRIELE SANTANA ALVES', faltas: 17, taxa: 10.0}
+                    ]
+                };
+            }
+
+            if (typeof dadosPD !== 'undefined') {
+                const pd = dadosPD;
+                setTextoSeguro('txt-pd-status-sync', `LIVE • ${pd.atualizado_em || ''}`);
+                setTextoSeguro('pd-taxa-abs', `${pd.taxa_abs}%`);
+                setTextoSeguro('pd-deficit', formatarNumeroInteiro(pd.deficit));
+                setTextoSeguro('pd-injustificadas', formatarNumeroInteiro(pd.fi_dias));
+                setTextoSeguro('pd-justificadas', formatarNumeroInteiro(pd.fj_dias));
+
+                const tbodyTurnos = document.getElementById('tbl-pd-turnos-body');
+                if (tbodyTurnos && pd.tabela_turnos) {
+                    let htmlTurnos = '';
+                    pd.tabela_turnos.forEach(t => {
+                        htmlTurnos += `
+                            <tr>
+                                <td style="text-align: left; color: #ffffff; font-weight: 700;">${t.turno}</td>
+                                <td><span class="val" style="color: #ff4b2b;">${t.faltas}</span></td>
+                                <td><span style="color: #00d2ff; background: rgba(0, 210, 255, 0.12); padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700;">${t.taxa}%</span></td>
+                            </tr>
+                        `;
+                    });
+                    tbodyTurnos.innerHTML = htmlTurnos;
+                }
+
+                const tbodySetores = document.getElementById('tbl-pd-setores-body');
+                const listaSetores = pd.todos_setores || pd.top_setores || [];
+                if (tbodySetores && listaSetores.length > 0) {
+                    let htmlSetores = '';
+                    listaSetores.forEach(g => {
+                        htmlSetores += `
+                            <tr>
+                                <td style="text-align: left; color: #ffffff; font-weight: 700;">${g.setor}</td>
+                                <td><span class="val" style="color: #ff4b2b;">${g.faltas}</span></td>
+                                <td><span style="color: #f6b93b; background: rgba(246, 185, 59, 0.12); padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700;">${g.taxa}%</span></td>
+                            </tr>
+                        `;
+                    });
+                    tbodySetores.innerHTML = htmlSetores;
+                }
+
+                const tbodyLideres = document.getElementById('tbl-pd-lideres-body');
+                const listaLideres = pd.todos_lideres || pd.top_lideres || [];
+                if (tbodyLideres && listaLideres.length > 0) {
+                    let htmlLideres = '';
+                    listaLideres.forEach(g => {
+                        htmlLideres += `
+                            <tr>
+                                <td style="text-align: left; color: #ffffff; font-weight: 700;">${g.lider}</td>
+                                <td><span class="val" style="color: #ff4b2b;">${g.faltas}</span></td>
+                                <td><span style="color: #f6b93b; background: rgba(246, 185, 59, 0.12); padding: 3px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700;">${g.taxa}%</span></td>
+                            </tr>
+                        `;
+                    });
+                    tbodyLideres.innerHTML = htmlLideres;
+                }
+                
+                desenharGraficosPD(pd.grafico_setor, pd.grafico_empresa, pd.grafico_diario);
+            }
+        }
+
+        window.onload = carregarScriptsSemCache;
+    </script>
+</body>
+</html>
