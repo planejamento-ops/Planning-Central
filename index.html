@@ -148,7 +148,7 @@
         .date-picker-wrapper input[type="date"]::-webkit-calendar-picker-indicator:hover, .date-picker-wrapper input[type="month"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 
         /* ========================================== */
-        /* ESTATÍSTICAS MACRO (TAB 2 WMS CORRIGIDA)   */
+        /* ESTATÍSTICAS MACRO                         */
         /* ========================================== */
         .macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 2px; }
         .macro-box { background: rgba(15, 23, 42, 0.55); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; backdrop-filter: blur(12px); display: flex; flex-direction: column; }
@@ -161,7 +161,6 @@
         .macro-box-pc .macro-header { color: #9b59b6; }
         .macro-stats { display: grid; grid-template-columns: repeat(4, 1fr); padding: 14px 12px; gap: 10px; }
         
-        /* REGRAS QUE CORRIGEM O LAYOUT DA ABA 2 */
         .stat-item { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; }
         .stat-item .label { font-size: 0.63rem; color: #a0aab5; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 3px; }
         .stat-item strong { font-size: 1.15rem; color: #ffffff; font-weight: 800; font-feature-settings: 'tnum' on; display: block; line-height: 1.1; }
@@ -568,7 +567,7 @@
                         </div>
                     </div>
 
-                    <!-- 4 CARDS NO TOPO (SEM O HEADCOUNT) -->
+                    <!-- 4 CARDS NO TOPO -->
                     <div class="tu-grid-main" style="grid-template-columns: repeat(4, 1fr);">
                         <div class="tu-card card-red">
                             <span class="material-symbols-outlined icon">person_off</span>
@@ -591,7 +590,6 @@
                     <!-- GRÁFICOS MENSAIS E DIÁRIO DE SETORES -->
                     <div class="tu-details-grid" style="margin-top: 6px; display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
                         
-                        <!-- CARD DO GRÁFICO DE SETOR DIÁRIO (COM FILTRO D-1 INTEGRADO) -->
                         <div class="tu-detail-box" style="display:flex; flex-direction:column; height: 260px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <h4 style="margin: 0;"><span class="material-symbols-outlined">bar_chart</span> Absenteísmo Diário por Setor (%)</h4>
@@ -603,23 +601,21 @@
                             <div style="flex:1; position:relative;"><canvas id="chartPdSetor"></canvas></div>
                         </div>
 
-                        <!-- GRÁFICO DE EMPRESA -->
                         <div class="tu-detail-box" style="display:flex; flex-direction:column; height: 260px;">
                             <h4><span class="material-symbols-outlined">pie_chart</span> Absenteísmo por Empresa (%)</h4>
                             <div style="flex:1; position:relative;"><canvas id="chartPdEmpresa"></canvas></div>
                         </div>
                     </div>
 
-                    <!-- GRÁFICO DIÁRIO DE LINHAS (COM PORCENTAGEM E LINHA META 4%) -->
+                    <!-- GRÁFICO DIÁRIO MISTO (BARRAS + LINHA META) -->
                     <div class="tu-detail-box box-cyan" style="margin-top: 12px; display:flex; flex-direction:column; height: 280px;">
-                        <h4><span class="material-symbols-outlined">timeline</span> Evolução Diária de Absenteísmo (%)</h4>
+                        <h4><span class="material-symbols-outlined">analytics</span> Evolução Diária de Absenteísmo (%)</h4>
                         <div style="flex:1; position:relative;"><canvas id="chartPdDiario"></canvas></div>
                     </div>
 
-                    <!-- VISÃO LADO A LADO: TURNO VS SETORES VS LÍDERES COM ALTURA FIXA E SCROLLBAR -->
+                    <!-- VISÃO LADO A LADO -->
                     <div class="tu-details-grid" style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1.2fr 1.2fr; gap: 12px;">
                         
-                        <!-- TABELA TURNOS -->
                         <div class="tu-detail-box box-cyan" style="height: 250px; display: flex; flex-direction: column;">
                             <h4>
                                 <div style="display: flex; flex-direction: column;">
@@ -643,7 +639,6 @@
                             </div>
                         </div>
 
-                        <!-- TABELA DE TODOS OS SETORES -->
                         <div class="tu-detail-box box-red" style="height: 250px; display: flex; flex-direction: column;">
                             <h4><span class="material-symbols-outlined">factory</span> 🔴 Absenteísmo por Setor</h4>
                             <div class="custom-scrollbar" style="flex: 1; overflow-y: auto; padding-right: 4px;">
@@ -662,7 +657,6 @@
                             </div>
                         </div>
 
-                        <!-- TABELA DE TODOS OS LÍDERES -->
                         <div class="tu-detail-box box-purple" style="height: 250px; display: flex; flex-direction: column;">
                             <h4><span class="material-symbols-outlined">badge</span> 🔴 Absenteísmo por Líder</h4>
                             <div class="custom-scrollbar" style="flex: 1; overflow-y: auto; padding-right: 4px;">
@@ -710,7 +704,7 @@
         let dadosOndasGeral = []; 
         let dadosOndasDataFiltrada = []; 
 
-        // PLUGIN CUSTOMIZADO CHART.JS: DESENHA VALORES MAIORES E NA COR PRETA PARA CONTRASTE
+        // PLUGIN PERSONALIZADO CHART.JS: DESENHA VALORES APENAS SE A BARRA ESTIVER VISÍVEL (TUDO EM BRANCO)
         const chartDataLabelsPlugin = {
             id: 'chartDataLabelsPlugin',
             afterDatasetsDraw(chart, args, options) {
@@ -718,7 +712,11 @@
 
                 const { ctx } = chart;
                 chart.data.datasets.forEach((dataset, i) => {
+                    if (!chart.isDatasetVisible(i)) return; 
+
                     const meta = chart.getDatasetMeta(i);
+                    if (dataset.type === 'line' || chart.config.type === 'line') return; 
+
                     meta.data.forEach((element, index) => {
                         const data = dataset.data[index];
                         const abs_data = dataset.absoluteData ? dataset.absoluteData[index] : null;
@@ -729,23 +727,21 @@
                             let x = element.x;
                             let y = element.y;
                             
-                            if (chart.config.type === 'bar') { 
+                            if (dataset.type === 'bar' || chart.config.type === 'bar') { 
                                 y = y + 16; 
-                                ctx.fillStyle = '#FFFFFF'; // TEXTO BRANCO PARA ALTO CONTRASTE
                             } 
                             else if (chart.config.type === 'doughnut') {
                                 const pos = element.tooltipPosition();
                                 x = pos.x; y = pos.y;
-                                ctx.fillStyle = '#ffffff';
                             }
 
+                            ctx.fillStyle = '#ffffff'; 
                             ctx.font = 'bold 12px "Plus Jakarta Sans"';
                             ctx.fillText(data + '%', x, y - 5);
                             
                             if (abs_data !== null) {
                                 ctx.font = 'bold 10px "Plus Jakarta Sans"';
-                                if (chart.config.type === 'bar') ctx.fillStyle = '#111111';
-                                else ctx.fillStyle = '#ffffff';
+                                ctx.fillStyle = '#ffffff'; 
                                 ctx.fillText('(' + abs_data + ')', x, y + 9);
                             }
                         }
@@ -974,13 +970,18 @@
         // ==========================================
         function atualizarGraficoSetorDia() {
             const elInput = document.getElementById('filtro-data-setor');
-            if (!elInput || !elInput.value || typeof dadosPD === 'undefined' || !dadosPD.grafico_setor_map) return;
+            if (!elInput || typeof dadosPD === 'undefined') return;
             
-            const dataSel = elInput.value;
-            const dadosDia = dadosPD.grafico_setor_map[dataSel] || { labels: [], data: [], absolutos: [] };
+            let dadosDia = null;
+            if (dadosPD.grafico_setor_map && elInput.value) {
+                dadosDia = dadosPD.grafico_setor_map[elInput.value];
+            }
+            if (!dadosDia) {
+                dadosDia = dadosPD.grafico_setor || { labels: [], data: [], absolutos: [] };
+            }
             
             const elSetor = document.getElementById('chartPdSetor');
-            if (elSetor) {
+            if (elSetor && dadosDia) {
                 const ctx = elSetor.getContext('2d');
                 if (chartPdSetor) chartPdSetor.destroy();
                 chartPdSetor = new Chart(ctx, {
@@ -1001,7 +1002,10 @@
                         plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return c.raw + '%'; } } } },
                         scales: { 
                             y: { display: false, beginAtZero: true }, 
-                            x: { grid: { display: false }, ticks: { font: { size: 10 } } } 
+                            x: { 
+                                grid: { display: false }, 
+                                ticks: { color: '#ffffff', font: { size: 11, weight: 'bold' } } 
+                            } 
                         }
                     },
                     plugins: [chartDataLabelsPlugin]
@@ -1047,32 +1051,33 @@
                 });
             }
 
-            // GRÁFICO DIÁRIO COM PORCENTAGEM E LINHA DE META (4%)
+            // GRÁFICO DIÁRIO MISTO (BARRAS + LINHA META)
             const elDiario = document.getElementById('chartPdDiario');
             if (elDiario && dadosDiario) {
                 const ctx = elDiario.getContext('2d');
                 if (chartPdDiario) chartPdDiario.destroy();
+                
                 chartPdDiario = new Chart(ctx, {
-                    type: 'line',
+                    type: 'bar', 
                     data: {
                         labels: dadosDiario.labels, 
                         datasets: dadosDiario.datasets
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        elements: {
-                            line: { tension: 0.4 }, 
-                            point: { radius: 3, hitRadius: 10, hoverRadius: 5 }
-                        },
                         plugins: { 
-                            legend: { position: 'top', labels: { color: '#a0aab5', font: { size: 11 }, usePointStyle: true, boxWidth: 8 } },
+                            legend: { 
+                                position: 'top', 
+                                labels: { color: '#a0aab5', font: { size: 11 }, usePointStyle: true, boxWidth: 8 } 
+                            },
                             tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + c.raw + '%'; } } }
                         },
                         scales: { 
-                            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, beginAtZero: true, ticks: { callback: function(val) { return val + '%'; } } }, 
-                            x: { grid: { color: 'rgba(255, 255, 255, 0.02)' }, ticks: { font: { size: 10 } } } 
+                            y: { display: false, beginAtZero: true }, 
+                            x: { grid: { display: false }, ticks: { color: '#a0aab5', font: { size: 10 } } } 
                         }
-                    }
+                    },
+                    plugins: [chartDataLabelsPlugin]
                 });
             }
         }
@@ -1274,10 +1279,11 @@
                     grafico_diario: {
                         labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15'],
                         datasets: [
-                            { label: '1º Turno', data: [8.6, 9.7, 9.3, 7.6, 9.2, 0, 6.6, 3.2, 8.0, 6.4, 6.9, 0, 8.2, 5.7, 6.1], borderColor: '#00d2ff', backgroundColor: '#00d2ff', borderWidth: 2 },
-                            { label: '2º Turno', data: [5.2, 6.1, 5.8, 4.9, 5.5, 0, 4.2, 2.1, 5.0, 4.1, 4.5, 0, 5.8, 3.9, 4.2], borderColor: '#f6b93b', backgroundColor: '#f6b93b', borderWidth: 2 },
-                            { label: '3º Turno', data: [11.2, 12.5, 11.8, 10.1, 11.0, 0, 9.5, 6.4, 10.8, 9.2, 10.1, 0, 11.5, 8.7, 9.1], borderColor: '#e64343', backgroundColor: '#e64343', borderWidth: 2 },
-                            { label: 'Meta (4%)', data: [4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0], borderColor: '#00b09b', borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false }
+                            { type: 'bar', label: 'Faltas Totais', data: [11.1, 10.3, 10.6, 10.0, 8.6, 11.9, 8.5, 8.9, 8.3, 9.6, 10.1, 8.2, 11.5, 8.7, 9.1], backgroundColor: 'rgba(0, 210, 255, 0.75)', borderColor: 'rgba(0, 210, 255, 1)', borderWidth: 1, borderRadius: 4, hidden: false },
+                            { type: 'bar', label: '1º Turno', data: [8.6, 9.7, 9.3, 7.6, 9.2, 0, 6.6, 3.2, 8.0, 6.4, 6.9, 0, 8.2, 5.7, 6.1], backgroundColor: '#3b82f6', borderColor: '#3b82f6', borderWidth: 1, borderRadius: 4, hidden: true },
+                            { type: 'bar', label: '2º Turno', data: [8.6, 7.1, 8.8, 6.9, 8.0, 0, 4.2, 2.1, 5.0, 4.1, 4.5, 0, 5.8, 3.9, 4.2], backgroundColor: '#f6b93b', borderColor: '#f6b93b', borderWidth: 1, borderRadius: 4, hidden: true },
+                            { type: 'bar', label: '3º Turno', data: [16.4, 14.1, 13.7, 15.8, 0, 0, 9.5, 6.4, 10.8, 9.2, 10.1, 0, 11.5, 8.7, 9.1], backgroundColor: '#e64343', borderColor: '#e64343', borderWidth: 1, borderRadius: 4, hidden: true },
+                            { type: 'line', label: 'Meta (4%)', data: [4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0], borderColor: '#00b09b', borderDash: [5, 5], borderWidth: 2, pointRadius: 0, fill: false, hidden: false }
                         ]
                     },
 
