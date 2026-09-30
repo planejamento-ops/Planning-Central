@@ -1,9 +1,9 @@
 window.dadosPD = {
-  "atualizado_em": "29/09/2026 16:47",
+  "atualizado_em": "29/09/2026 22:33",
   "taxa_abs": 9.8,
   "deficit": 48,
-  "fi_dias": 355,
-  "fj_dias": 467,
+  "fi_dias": 360,
+  "fj_dias": 471,
   "data_padrao_setor": "2026-09-29",
   "grafico_setor_map": {
     "2026-09-01": {
@@ -656,55 +656,55 @@ window.dadosPD = {
     },
     "2026-09-29": {
       "labels": [
+        "REABASTECIMENTO",
         "FECHAMENTO",
         "INVENTARIO",
         "EXPEDICAO",
         "SEPARACAO",
-        "REABASTECIMENTO",
         "RECEBIMENTO"
       ],
       "data": [
+        12.8,
         9.3,
         7.1,
         6.8,
-        5.0,
-        4.8,
-        0.0
+        5.9,
+        4.4
       ],
       "absolutos": [
+        5,
         4,
         1,
         3,
-        3,
-        1,
-        0
+        7,
+        2
       ]
     }
   },
   "grafico_setor": {
     "labels": [
+      "REABASTECIMENTO",
       "FECHAMENTO",
       "INVENTARIO",
       "EXPEDICAO",
       "SEPARACAO",
-      "REABASTECIMENTO",
       "RECEBIMENTO"
     ],
     "data": [
+      12.8,
       9.3,
       7.1,
       6.8,
-      5.0,
-      4.8,
-      0.0
+      5.9,
+      4.4
     ],
     "absolutos": [
+      5,
       4,
       1,
       3,
-      3,
-      1,
-      0
+      7,
+      2
     ]
   },
   "grafico_empresa": {
@@ -715,15 +715,15 @@ window.dadosPD = {
       "PACTUAL"
     ],
     "data": [
-      12.2,
-      10.1,
+      12.3,
+      10.2,
       9.5,
       7.8
     ],
     "absolutos": [
-      194,
-      127,
-      548,
+      197,
+      128,
+      554,
       114
     ]
   },
@@ -760,6 +760,46 @@ window.dadosPD = {
     ],
     "datasets": [
       {
+        "type": "bar",
+        "label": "Faltas Totais",
+        "data": [
+          11.1,
+          10.3,
+          10.6,
+          10.0,
+          8.6,
+          11.9,
+          8.5,
+          8.9,
+          8.3,
+          9.6,
+          6.0,
+          15.4,
+          9.5,
+          11.8,
+          10.2,
+          9.2,
+          9.9,
+          6.0,
+          16.7,
+          9.2,
+          8.6,
+          8.7,
+          9.6,
+          9.2,
+          8.2,
+          18.5,
+          14.4,
+          7.2
+        ],
+        "backgroundColor": "rgba(0, 210, 255, 0.75)",
+        "borderColor": "rgba(0, 210, 255, 1)",
+        "borderWidth": 1,
+        "borderRadius": 4,
+        "hidden": false
+      },
+      {
+        "type": "bar",
         "label": "1º Turno",
         "data": [
           8.6,
@@ -791,11 +831,14 @@ window.dadosPD = {
           10.4,
           4.5
         ],
-        "borderColor": "#00d2ff",
-        "backgroundColor": "#00d2ff",
-        "borderWidth": 2
+        "backgroundColor": "#3b82f6",
+        "borderColor": "#3b82f6",
+        "borderWidth": 1,
+        "borderRadius": 4,
+        "hidden": true
       },
       {
+        "type": "bar",
         "label": "2º Turno",
         "data": [
           8.6,
@@ -825,13 +868,16 @@ window.dadosPD = {
           11.9,
           0,
           15.9,
-          10.0
+          10.2
         ],
-        "borderColor": "#f6b93b",
         "backgroundColor": "#f6b93b",
-        "borderWidth": 2
+        "borderColor": "#f6b93b",
+        "borderWidth": 1,
+        "borderRadius": 4,
+        "hidden": true
       },
       {
+        "type": "bar",
         "label": "3º Turno",
         "data": [
           16.4,
@@ -863,11 +909,14 @@ window.dadosPD = {
           16.7,
           0.0
         ],
-        "borderColor": "#e64343",
         "backgroundColor": "#e64343",
-        "borderWidth": 2
+        "borderColor": "#e64343",
+        "borderWidth": 1,
+        "borderRadius": 4,
+        "hidden": true
       },
       {
+        "type": "line",
         "label": "Meta (4%)",
         "data": [
           4.0,
@@ -906,7 +955,8 @@ window.dadosPD = {
         ],
         "borderWidth": 2,
         "pointRadius": 0,
-        "fill": false
+        "fill": false,
+        "hidden": false
       }
     ]
   },
@@ -918,7 +968,7 @@ window.dadosPD = {
     },
     {
       "turno": "2º Turno",
-      "faltas": 336,
+      "faltas": 346,
       "taxa": 9.6
     },
     {
@@ -930,8 +980,8 @@ window.dadosPD = {
   "todos_setores": [
     {
       "setor": "SEPARACAO",
-      "faltas": 485,
-      "taxa": 12.1
+      "faltas": 489,
+      "taxa": 12.0
     },
     {
       "setor": "EXPEDICAO",
@@ -939,19 +989,19 @@ window.dadosPD = {
       "taxa": 8.4
     },
     {
+      "setor": "REABASTECIMENTO",
+      "faltas": 137,
+      "taxa": 10.3
+    },
+    {
       "setor": "FECHAMENTO",
       "faltas": 136,
       "taxa": 8.5
     },
     {
-      "setor": "REABASTECIMENTO",
-      "faltas": 133,
-      "taxa": 10.1
-    },
-    {
       "setor": "RECEBIMENTO",
-      "faltas": 71,
-      "taxa": 5.5
+      "faltas": 73,
+      "taxa": 5.6
     },
     {
       "setor": "INVENTARIO",
@@ -967,8 +1017,8 @@ window.dadosPD = {
     },
     {
       "lider": "LUIS PAULO REIS",
-      "faltas": 136,
-      "taxa": 9.3
+      "faltas": 140,
+      "taxa": 9.2
     },
     {
       "lider": "JOYCE SILVA DE OLIVEIRA",
@@ -979,6 +1029,11 @@ window.dadosPD = {
       "lider": "GEOVANI PAULO PAULINO JUNIOR",
       "faltas": 63,
       "taxa": 12.8
+    },
+    {
+      "lider": "FLAVIO MARTINS RUFINO",
+      "faltas": 56,
+      "taxa": 11.7
     },
     {
       "lider": "KAROLINE NASCIMENTO DE CARVALHO",
@@ -996,11 +1051,6 @@ window.dadosPD = {
       "taxa": 11.6
     },
     {
-      "lider": "FLAVIO MARTINS RUFINO",
-      "faltas": 52,
-      "taxa": 11.3
-    },
-    {
       "lider": "TARCISIO RICARDO MARTINS CLARO",
       "faltas": 43,
       "taxa": 7.4
@@ -1011,14 +1061,14 @@ window.dadosPD = {
       "taxa": 7.8
     },
     {
+      "lider": "EDMILSON BERTOLDO",
+      "faltas": 34,
+      "taxa": 7.0
+    },
+    {
       "lider": "PEDRO LEMOS DE SOUZA",
       "faltas": 33,
       "taxa": 11.5
-    },
-    {
-      "lider": "EDMILSON BERTOLDO",
-      "faltas": 32,
-      "taxa": 6.8
     },
     {
       "lider": "WALLACE BORATO AGUIAR",
