@@ -1,7 +1,7 @@
 window.dadosDemandaAtual = {
-  "atualizado_em": "28/11/2026 12:27",
+  "atualizado_em": "28/11/2026 13:27",
   "fotografia_dia": {
-    "data_referencia": "28/11/2026 12:27 (Ao Vivo)",
+    "data_referencia": "28/11/2026 13:27 (Ao Vivo)",
     "cards_atendimentos": {
       "ESTOJO": {
         "SPI": {
@@ -44,11 +44,11 @@ window.dadosDemandaAtual = {
           "pendentes_fr_pcs": 0,
           "finalizadas_gv_pcs": 0,
           "pendentes_gv_pcs": 0,
-          "backlog_wms_fr_cx": 537,
-          "backlog_wms_gv_cx": 229,
-          "backlog_wms_fr_pcs": 4143,
-          "backlog_wms_gv_pcs": 2186,
-          "is_wms": true
+          "backlog_wms_fr_cx": 0,
+          "backlog_wms_gv_cx": 0,
+          "backlog_wms_fr_pcs": 0,
+          "backlog_wms_gv_pcs": 0,
+          "is_wms": false
         },
         "MGI": {
           "total_wms_fr_cx": 611,
@@ -147,6 +147,31 @@ window.dadosDemandaAtual = {
           "is_wms": false
         }
       },
+      "SPC": {
+        "GERAL": {
+          "total_wms_fr_cx": 10367,
+          "total_wms_gv_cx": 16471,
+          "total_wms_fr_pcs": 580401,
+          "total_wms_gv_pcs": 812148,
+          "total_tu_fr_cx": 661,
+          "total_tu_gv_cx": 2894,
+          "total_tu_fr_pcs": 86186,
+          "total_tu_gv_pcs": 91525,
+          "finalizadas_fr_cx": 0,
+          "pendentes_fr_cx": 661,
+          "finalizadas_gv_cx": 0,
+          "pendentes_gv_cx": 2894,
+          "finalizadas_fr_pcs": 0,
+          "pendentes_fr_pcs": 86186,
+          "finalizadas_gv_pcs": 0,
+          "pendentes_gv_pcs": 91525,
+          "backlog_wms_fr_cx": 0,
+          "backlog_wms_gv_cx": 0,
+          "backlog_wms_fr_pcs": 0,
+          "backlog_wms_gv_pcs": 0,
+          "is_wms": false
+        }
+      },
       "SPI": {
         "GERAL": {
           "total_wms_fr_cx": 13527,
@@ -157,14 +182,14 @@ window.dadosDemandaAtual = {
           "total_tu_gv_cx": 10887,
           "total_tu_fr_pcs": 890210,
           "total_tu_gv_pcs": 488918,
-          "finalizadas_fr_cx": 11117,
-          "pendentes_fr_cx": 2624,
-          "finalizadas_gv_cx": 10880,
-          "pendentes_gv_cx": 7,
-          "finalizadas_fr_pcs": 487068,
-          "pendentes_fr_pcs": 403142,
-          "finalizadas_gv_pcs": 280683,
-          "pendentes_gv_pcs": 208235,
+          "finalizadas_fr_cx": 11530,
+          "pendentes_fr_cx": 2211,
+          "finalizadas_gv_cx": 10881,
+          "pendentes_gv_cx": 6,
+          "finalizadas_fr_pcs": 538198,
+          "pendentes_fr_pcs": 352012,
+          "finalizadas_gv_pcs": 312270,
+          "pendentes_gv_pcs": 176648,
           "backlog_wms_fr_cx": 0,
           "backlog_wms_gv_cx": 0,
           "backlog_wms_fr_pcs": 0,
@@ -182,8 +207,8 @@ window.dadosDemandaAtual = {
           "total_tu_gv_cx": 69,
           "total_tu_fr_pcs": 13834,
           "total_tu_gv_pcs": 888,
-          "finalizadas_fr_cx": 581,
-          "pendentes_fr_cx": 1242,
+          "finalizadas_fr_cx": 587,
+          "pendentes_fr_cx": 1236,
           "finalizadas_gv_cx": 69,
           "pendentes_gv_cx": 0,
           "finalizadas_fr_pcs": 0,
@@ -195,31 +220,6 @@ window.dadosDemandaAtual = {
           "backlog_wms_fr_pcs": 0,
           "backlog_wms_gv_pcs": 0,
           "is_wms": false
-        }
-      },
-      "SPC": {
-        "GERAL": {
-          "total_wms_fr_cx": 10367,
-          "total_wms_gv_cx": 16471,
-          "total_wms_fr_pcs": 580401,
-          "total_wms_gv_pcs": 812148,
-          "total_tu_fr_cx": 0,
-          "total_tu_gv_cx": 0,
-          "total_tu_fr_pcs": 0,
-          "total_tu_gv_pcs": 0,
-          "finalizadas_fr_cx": 0,
-          "pendentes_fr_cx": 0,
-          "finalizadas_gv_cx": 0,
-          "pendentes_gv_cx": 0,
-          "finalizadas_fr_pcs": 0,
-          "pendentes_fr_pcs": 0,
-          "finalizadas_gv_pcs": 0,
-          "pendentes_gv_pcs": 0,
-          "backlog_wms_fr_cx": 10367,
-          "backlog_wms_gv_cx": 16471,
-          "backlog_wms_fr_pcs": 580401,
-          "backlog_wms_gv_pcs": 812148,
-          "is_wms": true
         }
       }
     }
